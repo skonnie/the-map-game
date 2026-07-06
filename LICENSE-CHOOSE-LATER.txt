@@ -1,9 +1,0 @@
-No licence has been chosen yet.
-
-For GitHub, it is worth adding a proper LICENSE file eventually, but the choice matters:
-
-- MIT: very permissive; others can reuse and modify with attribution.
-- GPL: others can reuse/modify, but derivative code must generally stay under GPL.
-- All rights reserved: do not add an open-source licence; keep the code private/proprietary unless you grant permission separately.
-
-Replace this placeholder with a real LICENSE file only when you know which option you want.
