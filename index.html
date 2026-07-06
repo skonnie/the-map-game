@@ -4,15 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Map Game - An Interactive World</title>
-<meta name="description" content="The Map Game: an interactive world map and geography quiz with country, capital, subgame, and dispute/identity layers." />
-<meta name="theme-color" content="#172033" />
-<meta property="og:title" content="The Map Game" />
-<meta property="og:description" content="An interactive geography game for countries, capitals, subgames, and map quizzes." />
-<meta property="og:type" content="website" />
-<meta property="og:image" content="assets/social-preview.png" />
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-<link rel="manifest" href="manifest.webmanifest" />
-
 <link id="leaflet-css" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; background: #bfefff; overflow: hidden; }
@@ -2931,7 +2922,7 @@ function overlayStyle(feature) {
 }
 function highlightedStyle(feature) { return { weight: 2.2, color: '#101827', fillOpacity: 1 }; }
 
-let map, countryLayer, ukHomeCountryLayer, territoryLayer, moroccoWesternSaharaBoundaryLayer, canaryIslandsLayer, helperLayer, labelLayer, capitalMarkerLayer, capitalMarkerLayers, waterLabelLayer, inlandWaterLayer, usStateLayer, usStateLabelLayer, canadaProvinceLayer, canadaProvinceLabelLayer, australiaRegionLayer, australiaRegionLabelLayer, irelandCountyLayer, irelandCountyLabelLayer, regionalCountyLayers, regionalCountyLabelLayers, controlPanel, hoverLabelEl;
+let map, countryLayer, ukHomeCountryLayer, territoryLayer, moroccoWesternSaharaBoundaryLayer, specialRecognitionLayer, helperLayer, labelLayer, capitalMarkerLayer, capitalMarkerLayers, waterLabelLayer, inlandWaterLayer, usStateLayer, usStateLabelLayer, canadaProvinceLayer, canadaProvinceLabelLayer, australiaRegionLayer, australiaRegionLabelLayer, irelandCountyLayer, irelandCountyLabelLayer, regionalCountyLayers, regionalCountyLabelLayers, controlPanel, hoverLabelEl;
 let quizHighlightLayer, quizState = null, quizCluePanTimer = null;
 let waterLabelLandFeatures = [];
 let naturalInlandWaterFeatures = {};
@@ -2989,40 +2980,169 @@ const UN_WPP_ENTITY_ALIASES = {
   'SINTMAARTENDUTCHPART': ['SINTMAARTEN']
 };
 
-const WORLD_SPECIAL_REGION_LABELS = [
-  { name: 'Canary Islands', subtext: 'Spain', lat: 28.45, lng: -15.70, className: 'label-territory' }
-];
-const WORLD_SPECIAL_CAPITAL_MARKERS = [
-  { country: 'Canary Islands, Spain', capital: 'Santa Cruz de Tenerife', lat: 28.4636, lng: -16.2518 },
-  { country: 'Canary Islands, Spain', capital: 'Las Palmas de Gran Canaria', lat: 28.1235, lng: -15.4363 }
+// Special offshore/island-region recognition standard:
+// - These are not treated as independent countries.
+// - They remain under their sovereign state in popups and information panels.
+// - They get their own transparent click overlay, helper button, label, and capital marker(s)
+//   where the parent country would otherwise swallow them visually.
+const WORLD_SPECIAL_RECOGNITION_REGIONS = [
+  {
+    id: 'canaryislands', name: 'Canary Islands', parent: 'Spain',
+    type: 'Autonomous community of Spain',
+    capital: 'Santa Cruz de Tenerife / Las Palmas de Gran Canaria',
+    note: 'Recognised here as a major offshore autonomous island region of Spain.',
+    lat: 28.45, lng: -15.70,
+    capitals: [
+      { capital: 'Santa Cruz de Tenerife', lat: 28.4636, lng: -16.2518 },
+      { capital: 'Las Palmas de Gran Canaria', lat: 28.1235, lng: -15.4363 }
+    ],
+    boxes: [
+      [-18.25,27.55,-17.82,27.92], [-18.10,28.43,-17.66,28.90], [-17.42,27.98,-17.02,28.26],
+      [-16.95,27.88,-16.08,28.68], [-15.98,27.70,-15.28,28.25], [-14.60,27.78,-13.75,28.88],
+      [-13.95,28.75,-13.20,29.35]
+    ]
+  },
+  {
+    id: 'balearicislands', name: 'Balearic Islands', parent: 'Spain',
+    type: 'Autonomous community of Spain',
+    capital: 'Palma',
+    note: 'Includes Mallorca / Majorca, Menorca, Ibiza and Formentera.',
+    lat: 39.55, lng: 2.95,
+    capitals: [{ capital: 'Palma', lat: 39.5696, lng: 2.6502 }],
+    boxes: [
+      [2.22,39.18,3.55,40.05],   // Mallorca / Majorca
+      [3.75,39.75,4.42,40.12],   // Menorca
+      [1.12,38.58,1.78,39.22]    // Ibiza and Formentera
+    ]
+  },
+  {
+    id: 'corsica', name: 'Corsica', parent: 'France',
+    type: 'Territorial collectivity of France',
+    capital: 'Ajaccio',
+    note: 'Recognised here as a major Mediterranean island collectivity within France.',
+    lat: 42.15, lng: 9.08,
+    capitals: [{ capital: 'Ajaccio', lat: 41.9192, lng: 8.7386 }],
+    boxes: [[8.48,41.30,9.62,43.05]]
+  },
+  {
+    id: 'sardinia', name: 'Sardinia', parent: 'Italy',
+    type: 'Autonomous region of Italy',
+    capital: 'Cagliari',
+    note: 'Recognised here as a major Mediterranean island and autonomous region of Italy.',
+    lat: 40.05, lng: 9.05,
+    capitals: [{ capital: 'Cagliari', lat: 39.2238, lng: 9.1217 }],
+    boxes: [[8.05,38.84,9.90,41.34]]
+  },
+  {
+    id: 'sicily', name: 'Sicily', parent: 'Italy',
+    type: 'Autonomous region of Italy',
+    capital: 'Palermo',
+    note: 'Recognised here as a major Mediterranean island and autonomous region of Italy.',
+    lat: 37.55, lng: 14.00,
+    capitals: [{ capital: 'Palermo', lat: 38.1157, lng: 13.3615 }],
+    boxes: [[12.35,36.55,15.70,38.35]]
+  },
+  {
+    id: 'madeira', name: 'Madeira', parent: 'Portugal',
+    type: 'Autonomous region of Portugal',
+    capital: 'Funchal',
+    note: 'Recognised here as a major offshore autonomous island region of Portugal.',
+    lat: 32.75, lng: -16.95,
+    capitals: [{ capital: 'Funchal', lat: 32.6669, lng: -16.9241 }],
+    boxes: [[-17.30,32.30,-16.20,33.15]]
+  },
+  {
+    id: 'azores', name: 'Azores', parent: 'Portugal',
+    type: 'Autonomous region of Portugal',
+    capital: 'Ponta Delgada / Angra do Heroísmo / Horta',
+    note: 'Recognised here as a major Atlantic autonomous island region of Portugal.',
+    lat: 38.50, lng: -28.20,
+    capitals: [
+      { capital: 'Ponta Delgada', lat: 37.7412, lng: -25.6756 },
+      { capital: 'Angra do Heroísmo', lat: 38.6550, lng: -27.2208 },
+      { capital: 'Horta', lat: 38.5347, lng: -28.6300 }
+    ],
+    boxes: [
+      [-31.35,39.25,-30.90,39.80], [-28.95,38.30,-28.30,38.85], [-27.45,38.45,-26.90,38.85],
+      [-25.95,37.55,-25.05,38.05], [-25.20,36.85,-24.65,37.20]
+    ]
+  },
+  {
+    id: 'crete', name: 'Crete', parent: 'Greece',
+    type: 'Region of Greece',
+    capital: 'Heraklion',
+    note: 'Recognised here as a major offshore island region of Greece.',
+    lat: 35.20, lng: 24.90,
+    capitals: [{ capital: 'Heraklion', lat: 35.3387, lng: 25.1442 }],
+    boxes: [[23.30,34.75,26.45,35.75]]
+  },
+  {
+    id: 'aland', name: 'Åland Islands', parent: 'Finland',
+    type: 'Autonomous region of Finland',
+    capital: 'Mariehamn',
+    note: 'Recognised here as a well-known autonomous island region of Finland.',
+    lat: 60.15, lng: 19.95,
+    capitals: [{ capital: 'Mariehamn', lat: 60.0973, lng: 19.9348 }],
+    boxes: [[19.35,59.85,20.65,60.45]]
+  },
+  {
+    id: 'gotland', name: 'Gotland', parent: 'Sweden',
+    type: 'Island region of Sweden',
+    capital: 'Visby',
+    note: 'Recognised here as a large and historically distinctive Baltic island of Sweden.',
+    lat: 57.55, lng: 18.55,
+    capitals: [{ capital: 'Visby', lat: 57.6348, lng: 18.2948 }],
+    boxes: [[18.05,56.90,19.05,58.00]]
+  },
+  {
+    id: 'bornholm', name: 'Bornholm', parent: 'Denmark',
+    type: 'Island municipality of Denmark',
+    capital: 'Rønne',
+    note: 'Recognised here as a well-known offshore Baltic island of Denmark.',
+    lat: 55.15, lng: 14.90,
+    capitals: [{ capital: 'Rønne', lat: 55.1009, lng: 14.7066 }],
+    boxes: [[14.55,54.95,15.25,55.35]]
+  }
 ];
 
-// The Canary Islands are part of Spain, but they sit far from mainland Spain.
-// This overlay gives them their own educational recognition while keeping Spain/Madrid intact.
-const CANARY_ISLANDS_RECOGNITION_FEATURE = {
-  type: 'Feature',
-  properties: {
-    QUIZ_DISPLAY_NAME: 'Canary Islands',
-    QUIZ_CAPITAL: 'Santa Cruz de Tenerife / Las Palmas de Gran Canaria',
-    NAME: 'Canary Islands',
-    NAME_EN: 'Canary Islands',
-    TYPE: 'Autonomous community',
-    ADMIN: 'Spain',
-    SOVEREIGNT: 'Spain'
-  },
-  geometry: {
+function recognitionBoxesToGeometry(boxes) {
+  return {
     type: 'MultiPolygon',
-    coordinates: [
-      [[[-18.25,27.55],[-17.82,27.55],[-17.82,27.92],[-18.25,27.92],[-18.25,27.55]]],
-      [[[-18.10,28.43],[-17.66,28.43],[-17.66,28.90],[-18.10,28.90],[-18.10,28.43]]],
-      [[[-17.42,27.98],[-17.02,27.98],[-17.02,28.26],[-17.42,28.26],[-17.42,27.98]]],
-      [[[-16.95,27.88],[-16.08,27.88],[-16.08,28.68],[-16.95,28.68],[-16.95,27.88]]],
-      [[[-15.98,27.70],[-15.28,27.70],[-15.28,28.25],[-15.98,28.25],[-15.98,27.70]]],
-      [[[-14.60,27.78],[-13.75,27.78],[-13.75,28.88],[-14.60,28.88],[-14.60,27.78]]],
-      [[[-13.95,28.75],[-13.20,28.75],[-13.20,29.35],[-13.95,29.35],[-13.95,28.75]]]
-    ]
-  }
-};
+    coordinates: (boxes || []).map(function(b) {
+      const w = Number(b[0]), s = Number(b[1]), e = Number(b[2]), n = Number(b[3]);
+      return [[[w,s],[e,s],[e,n],[w,n],[w,s]]];
+    })
+  };
+}
+function makeWorldRecognitionFeature(region) {
+  return {
+    type: 'Feature',
+    properties: {
+      QUIZ_UID: 'special|' + region.id,
+      QUIZ_DISPLAY_NAME: region.name,
+      QUIZ_CAPITAL: region.capital,
+      QUIZ_PARENT: region.parent,
+      QUIZ_NOTE: region.note || '',
+      HELPER_LAT: region.lat,
+      HELPER_LNG: region.lng,
+      NAME: region.name,
+      NAME_EN: region.name,
+      TYPE: region.type || 'Island region',
+      ADMIN: region.parent,
+      SOVEREIGNT: region.parent
+    },
+    geometry: recognitionBoxesToGeometry(region.boxes)
+  };
+}
+const WORLD_SPECIAL_RECOGNITION_FEATURES = WORLD_SPECIAL_RECOGNITION_REGIONS.map(makeWorldRecognitionFeature);
+const WORLD_SPECIAL_REGION_LABELS = WORLD_SPECIAL_RECOGNITION_REGIONS.map(function(region) {
+  return { name: region.name, subtext: region.parent, lat: region.lat, lng: region.lng, className: 'label-territory' };
+});
+const WORLD_SPECIAL_CAPITAL_MARKERS = WORLD_SPECIAL_RECOGNITION_REGIONS.flatMap(function(region) {
+  return (region.capitals || []).map(function(item) {
+    return { country: region.name + ', ' + region.parent, capital: item.capital, lat: item.lat, lng: item.lng };
+  });
+});
 
 function ensureCapitalMarkerLayers() {
   if (!capitalMarkerLayers) capitalMarkerLayers = {};
@@ -3134,49 +3254,64 @@ function addWorldSpecialMapAnnotations() {
     addCapitalMarkerAt(item.country, item.capital, L.latLng(Number(item.lat), Number(item.lng)), 'world');
   }
 }
-function canaryIslandsPopupHtml() {
-  return `<div class="popup-card"><div class="popup-country">Canary Islands</div><div class="popup-capital">Autonomous community of Spain</div><div class="popup-capital">Co-capitals: Santa Cruz de Tenerife / Las Palmas de Gran Canaria</div><div class="popup-extra">Sovereign state: Spain</div></div>`;
+function specialRegionPopupHtml(feature) {
+  const p = (feature && feature.properties) || {};
+  const name = displayName(p);
+  const type = prop(p, ['TYPE']) || 'Island region';
+  const parent = prop(p, ['QUIZ_PARENT']) || prop(p, ['ADMIN']) || prop(p, ['SOVEREIGNT']) || '';
+  const cap = prop(p, ['QUIZ_CAPITAL']) || 'not listed in source';
+  const note = prop(p, ['QUIZ_NOTE']);
+  return `<div class="popup-card"><div class="popup-country">${esc(name)}</div><div class="popup-capital">${esc(type)}</div><div class="popup-capital">Capital / main town: ${esc(cap)}</div>${parent ? `<div class="popup-extra">Sovereign state: ${esc(parent)}</div>` : ''}${note ? `<div class="popup-extra">${esc(note)}</div>` : ''}</div>`;
 }
-function openCanaryIslandsPopup(layer, e) {
-  if (!layer) return;
+function openSpecialRegionPopup(layer, feature, fallbackLatLng, e) {
+  if (!layer || !feature) return;
   if (e && e.originalEvent) L.DomEvent.stop(e.originalEvent);
-  setInfoWidgetSelection('world', CANARY_ISLANDS_RECOGNITION_FEATURE);
-  const uid = 'special|canaryislands';
+  setInfoWidgetSelection('world', feature);
+  const uid = prop((feature && feature.properties) || {}, ['QUIZ_UID']) || ('special|' + norm(displayName((feature && feature.properties) || {})));
   if (openId === uid) { map.closePopup(); openId = null; return; }
   openId = uid;
-  layer.openPopup(e && e.latlng ? e.latlng : L.latLng(28.45, -15.70));
+  layer.openPopup(e && e.latlng ? e.latlng : fallbackLatLng);
 }
-function createCanaryIslandsRecognitionLayer() {
-  return L.geoJSON(CANARY_ISLANDS_RECOGNITION_FEATURE, {
+function createWorldSpecialRecognitionLayer() {
+  return L.geoJSON({ type: 'FeatureCollection', features: WORLD_SPECIAL_RECOGNITION_FEATURES }, {
     pane: 'territoryPane',
     style: function() {
       return { fillColor: '#ffffff', fillOpacity: 0.01, color: '#172033', opacity: 0, weight: 0, interactive: true, bubblingMouseEvents: false };
     },
     onEachFeature: function(feature, layer) {
+      const p = feature.properties || {};
+      const name = displayName(p);
+      const parent = prop(p, ['QUIZ_PARENT']) || prop(p, ['ADMIN']) || '';
+      const fallback = L.latLng(Number(prop(p, ['HELPER_LAT'])), Number(prop(p, ['HELPER_LNG'])));
       layer._quizFeature = feature;
-      layer._quizUid = 'special|canaryislands';
-      layer.bindPopup(canaryIslandsPopupHtml(), { className: 'country-popup', closeButton: false, autoPan: true, maxWidth: 340 });
-      bindHoverLabel(layer, function() { return specialRegionLabelHtml('Canary Islands', 'Spain'); });
-      layer.on('click', function(e) { openCanaryIslandsPopup(this, e); });
+      layer._quizUid = prop(p, ['QUIZ_UID']) || ('special|' + norm(name));
+      layer.bindPopup(specialRegionPopupHtml(feature), { className: 'country-popup', closeButton: false, autoPan: true, maxWidth: 370 });
+      bindHoverLabel(layer, function() { return specialRegionLabelHtml(name, parent); });
+      layer.on('click', function(e) { openSpecialRegionPopup(this, feature, fallback, e); });
     }
   });
 }
-function addCanaryIslandsHelperMarker() {
+function addWorldSpecialRegionHelperMarkers() {
   if (!helperLayer) return;
-  const feature = CANARY_ISLANDS_RECOGNITION_FEATURE;
-  const c = L.latLng(28.45, -15.70);
-  const key = 'SPECIAL|CANARYISLANDS|HELPER';
-  if (markerKeys.has(key)) return;
-  markerKeys.add(key);
-  const marker = L.circleMarker(c, {
-    radius: 3.8, weight: 1.3, color: '#ffffff', fillColor: colorForFeature(feature), fillOpacity: 0.96, opacity: 0.96, className: 'island-helper', pane: 'helperPane', bubblingMouseEvents: false
-  }).bindPopup(canaryIslandsPopupHtml(), { className: 'country-popup', closeButton: false, autoPan: true, maxWidth: 340 });
-  marker._quizFeature = feature;
-  marker._quizUid = 'special|canaryislands';
-  bindHoverLabel(marker, function() { return specialRegionLabelHtml('Canary Islands', 'Spain'); });
-  marker.on('click', function(e) { openCanaryIslandsPopup(this, e); });
-  marker.addTo(helperLayer);
-  helperMarkers.push(marker);
+  for (const feature of WORLD_SPECIAL_RECOGNITION_FEATURES) {
+    const p = feature.properties || {};
+    const name = displayName(p);
+    const parent = prop(p, ['QUIZ_PARENT']) || prop(p, ['ADMIN']) || '';
+    const c = L.latLng(Number(prop(p, ['HELPER_LAT'])), Number(prop(p, ['HELPER_LNG'])));
+    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng)) continue;
+    const key = 'SPECIAL|' + norm(name) + '|HELPER';
+    if (markerKeys.has(key)) continue;
+    markerKeys.add(key);
+    const marker = L.circleMarker(c, {
+      radius: 3.8, weight: 1.3, color: '#ffffff', fillColor: colorForFeature(feature), fillOpacity: 0.96, opacity: 0.96, className: 'island-helper', pane: 'helperPane', bubblingMouseEvents: false
+    }).bindPopup(specialRegionPopupHtml(feature), { className: 'country-popup', closeButton: false, autoPan: true, maxWidth: 370 });
+    marker._quizFeature = feature;
+    marker._quizUid = prop(p, ['QUIZ_UID']) || ('special|' + norm(name));
+    bindHoverLabel(marker, function() { return specialRegionLabelHtml(name, parent); });
+    marker.on('click', function(e) { openSpecialRegionPopup(this, feature, c, e); });
+    marker.addTo(helperLayer);
+    helperMarkers.push(marker);
+  }
 }
 function firstCapitalName(cap) {
   return String(cap || '').split('/')[0].trim();
@@ -4385,7 +4520,7 @@ function applyMapMode(fit=false) {
   const showLabels = labelsToggleOn();
   removeAllCapitalMarkerLayers();
   removeIfPresent(moroccoWesternSaharaBoundaryLayer);
-  removeIfPresent(canaryIslandsLayer);
+  removeIfPresent(specialRecognitionLayer);
   if (mapMode === 'us-states') {
     removeIfPresent(countryLayer); removeIfPresent(ukHomeCountryLayer); removeIfPresent(territoryLayer); removeIfPresent(helperLayer); removeIfPresent(labelLayer);
     removeAllRegionalLayers();
@@ -4447,7 +4582,7 @@ function applyMapMode(fit=false) {
     updateInlandWaterBodies();
     addIfAbsent(waterLabelLayer);
     updateWaterLabels();
-    addIfAbsent(countryLayer); addIfAbsent(ukHomeCountryLayer); addIfAbsent(territoryLayer); addIfAbsent(canaryIslandsLayer); addIfAbsent(moroccoWesternSaharaBoundaryLayer); addIfAbsent(helperLayer);
+    addIfAbsent(countryLayer); addIfAbsent(ukHomeCountryLayer); addIfAbsent(territoryLayer); addIfAbsent(specialRecognitionLayer); addIfAbsent(moroccoWesternSaharaBoundaryLayer); addIfAbsent(helperLayer);
     if (showLabels) addIfAbsent(labelLayer); else removeIfPresent(labelLayer);
     if (fit) map.fitBounds(WORLD_VIEW_BOUNDS, {animate: true, padding: [2,2]});
   }
@@ -5303,7 +5438,7 @@ async function startQuizMap() {
     irelandCountyLayer = L.layerGroup();
     ukHomeCountryLayer = L.layerGroup();
     moroccoWesternSaharaBoundaryLayer = createMoroccoWesternSaharaDottedBoundaryLayer();
-    canaryIslandsLayer = createCanaryIslandsRecognitionLayer();
+    specialRecognitionLayer = createWorldSpecialRecognitionLayer();
     createControlPanel();
     for (const m of MANUAL_MICROSTATE_MARKERS) addManualMicrostateMarker(m);
 
@@ -5328,7 +5463,8 @@ async function startQuizMap() {
     loadUnWppPopulationData();
     waterLabelLandFeatures = [
       ...((countries && countries.features) || []).filter(f => f && f.geometry),
-      ...(overlayCollection.features || []).filter(f => f && f.geometry)
+      ...(overlayCollection.features || []).filter(f => f && f.geometry),
+      ...(WORLD_SPECIAL_RECOGNITION_FEATURES || []).filter(f => f && f.geometry)
     ];
     territoryLayer = L.geoJSON(overlayCollection, {
       pane: 'territoryPane', style: overlayStyle,
@@ -5337,7 +5473,7 @@ async function startQuizMap() {
 
     if (tiny && tiny.features) { for (const f of tiny.features) { addTinyPointMarker(f); if (helperMarkerEligible(f, 'tiny')) { addLabelFromPointFeature(f, 'tiny'); addCapitalMarkerForFeature(f); } } }
     addWorldSpecialMapAnnotations();
-    addCanaryIslandsHelperMarker();
+    addWorldSpecialRegionHelperMarkers();
     map.on('zoomend', updateHelperVisibility);
     updateHelperVisibility();
     applyMapMode(false);
