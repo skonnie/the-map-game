@@ -4450,6 +4450,22 @@ function showQuizPhoto(r, keepCaption) {
     applyImgWithFallback(img, urls, null);
   });
 }
+let royalsAutoCollapsedControls = false;
+function setControlPanelCollapsed(collapsed) {
+  const panel = document.getElementById('control-panel');
+  const btn = document.getElementById('control-collapse');
+  if (!panel) return;
+  panel.classList.toggle('collapsed', collapsed);
+  if (btn) {
+    btn.textContent = collapsed ? '+' : '−';
+    btn.setAttribute('aria-label', collapsed ? 'Expand controls' : 'Collapse controls');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+}
+function isControlPanelCollapsed() {
+  const panel = document.getElementById('control-panel');
+  return !!(panel && panel.classList.contains('collapsed'));
+}
 function royalsDeepCutsOn() {
   const el = document.getElementById('royals-deep-cuts');
   return !!(el && el.checked);
@@ -4610,6 +4626,10 @@ function beginRoyalsQuiz(royalSubset) {
   const pool = (royalSubset && royalSubset.length) ? royalSubset : royalQuizPool(royalsDeepCutsOn());
   if (allEligible.length < 4 || !pool.length) return;
   quizState = { mode: mapMode, kind: 'royals', questions: buildRoyalQuestions(pool, allEligible), index: 0, score: 0, locked: false, awaitingMapClick: false };
+  if (!isControlPanelCollapsed()) {
+    setControlPanelCollapsed(true);
+    royalsAutoCollapsedControls = true;
+  }
   renderQuizQuestion();
 }
 function currentLabelMode() {
@@ -5312,6 +5332,10 @@ function stopQuiz(silent=true) {
   clearQuizHighlight(); hideHoverLabel();
   if (wasPanelQuiz) closeDisputeInfo();
   hideQuizPhoto();
+  if (royalsAutoCollapsedControls) {
+    royalsAutoCollapsedControls = false;
+    setControlPanelCollapsed(false);
+  }
   const panel = quizPanelEl();
   if (panel) { panel.classList.remove('active'); panel.classList.remove('disputes-quiz'); }
   const quizTitleEl = document.querySelector('#quiz-game-panel .quiz-game-title');
@@ -5558,10 +5582,8 @@ function createControlPanel() {
   if (collapseBtn && panel) {
     collapseBtn.addEventListener('click', function(e) {
       L.DomEvent.stop(e);
-      const collapsed = panel.classList.toggle('collapsed');
-      collapseBtn.textContent = collapsed ? '+' : '−';
-      collapseBtn.setAttribute('aria-label', collapsed ? 'Expand controls' : 'Collapse controls');
-      collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      royalsAutoCollapsedControls = false;
+      setControlPanelCollapsed(!panel.classList.contains('collapsed'));
     });
   }
   const legacyToggle = document.getElementById('toggle-labels');
