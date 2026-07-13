@@ -252,6 +252,7 @@
     user-select: none;
   }
   #quiz-game-panel.active { display: block; }
+  #quiz-game-panel.disputes-quiz { width: min(252px, calc(100vw - 28px)); max-height: calc(100vh - 108px); overflow-y: auto; }
   .quiz-game-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
   .quiz-game-title { font-size: 12px; font-weight: 900; color: #52617a; text-transform: uppercase; letter-spacing: .04em; }
   .quiz-progress { font-size: 11px; font-weight: 850; color: #172033; white-space: nowrap; }
@@ -586,7 +587,7 @@
 
   /* Territorial disputes */
   .disputes-toggle-btn.active { background: #7c2d12; color: white; border-color: #7c2d12; }
-  #disputes-panel {
+  #disputes-panel, #royals-panel {
     display: none; position: absolute; z-index: 975; left: 14px; top: 92px;
     width: min(240px, calc(100vw - 28px));
     box-sizing: border-box;
@@ -594,7 +595,7 @@
     box-shadow: 0 10px 28px rgba(0,0,0,.25); padding: 9px 10px;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
-  #disputes-panel.active { display: block; }
+  #disputes-panel.active, #royals-panel.active { display: block; }
   .disputes-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
   .disputes-title { font-weight: 900; font-size: 13px; }
   .disputes-x { border: none; background: transparent; color: #52617a; font-size: 17px; line-height: 1; font-weight: 800; cursor: pointer; padding: 2px 6px; border-radius: 7px; }
@@ -631,8 +632,26 @@
   .dispute-info-title { font-size: 14px; font-weight: 900; }
   .dispute-info-parties { margin-top: 2px; font-size: 10.5px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: .03em; }
   .dispute-info-text { margin-top: 6px; font-size: 12px; line-height: 1.45; }
+  #dispute-info-photo { display: none; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; margin: 6px auto 9px; border: 3px solid #caa64a; box-shadow: 0 3px 12px rgba(0,0,0,.22); background: #f3ead2; }
+  #dispute-info-photo.show { display: block; }
+  #quiz-photo-overlay { display: none; position: absolute; z-index: 945; left: 50%; top: 96px; transform: translateX(-50%); width: min(350px, calc(100vw - 24px)); pointer-events: none; background: rgba(255,255,255,.97); border: 3px solid #caa64a; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.30); padding: 6px; box-sizing: border-box; }
+  #quiz-photo-overlay.active { display: block; }
+  #quiz-photo-img { display: none; width: 100%; height: auto; max-height: 46vh; object-fit: cover; object-position: 50% 12%; border-radius: 9px; }
+  #quiz-photo-img.show { display: block; }
+  #quiz-photo-name { display: none; text-align: center; font-weight: 900; font-size: 17px; padding: 16px 8px; color: #172033; }
+  #quiz-photo-name.show { display: block; }
+  #quiz-photo-name.caption { font-size: 12.5px; padding: 5px 6px 2px; color: #52617a; }
+  #dispute-info.quiz-docked { left: auto; right: 14px; top: auto; bottom: 14px; width: min(324px, calc(100vw - 28px)); }
   @media (max-width: 680px) {
-    #disputes-panel { width: min(212px, calc(100vw - 28px)); top: 88px; }
+    #quiz-photo-overlay { left: auto; right: 10px; transform: none; top: 92px; width: min(230px, calc(100vw - 28px)); }
+    #quiz-photo-img { max-height: 34vh; }
+  }
+  .disputes-quiz-row { display: grid; gap: 6px; margin: 0 0 8px; }
+  .disputes-quiz-row .quiz-start-btn { margin-top: 0; }
+  .disputes-deepcut-row { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 750; color: #52617a; cursor: pointer; user-select: none; }
+  .disputes-deepcut-row input { width: 13px; height: 13px; margin: 0; cursor: pointer; }
+  @media (max-width: 680px) {
+    #disputes-panel, #royals-panel { width: min(212px, calc(100vw - 28px)); top: 88px; }
     #dispute-info { width: min(276px, calc(100vw - 28px)); left: 14px; top: auto; bottom: 14px; }
   }
 </style>
@@ -711,6 +730,7 @@
     <button id="toggle-capital-markers" class="quiz-start-btn capital-toggle-btn" type="button" aria-pressed="false">Show capital cities</button>
     <div class="quiz-section-title">Explore</div>
     <button id="toggle-disputes" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Territorial &amp; identity disputes</button>
+    <button id="toggle-royals" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Monarchies &amp; Royals</button>
     <div class="quiz-section-title">Game</div>
     <button id="start-quiz" class="quiz-start-btn" type="button">Start 10-question quiz</button>
   </div>
@@ -741,7 +761,29 @@
     <button id="disputes-close" class="disputes-x" type="button" aria-label="Close disputes list">×</button>
   </div>
   <div class="disputes-note">Includes territorial disputes and selected internal identity/autonomy questions. Areas shown are approximate, for education only. Inclusion implies no position on any claim.</div>
+  <div class="disputes-quiz-row">
+    <button id="start-disputes-quiz" class="quiz-start-btn disputes-quiz-btn" type="button">Start disputes quiz</button>
+    <label class="disputes-deepcut-row"><input type="checkbox" id="disputes-deep-cuts" /> <span>Include deep cuts (harder)</span></label>
+  </div>
   <div id="disputes-list" class="disputes-list"></div>
+</div>
+
+<div id="quiz-photo-overlay" aria-hidden="true">
+  <img id="quiz-photo-img" alt="" draggable="false" referrerpolicy="no-referrer" decoding="async" />
+  <div id="quiz-photo-name"></div>
+</div>
+
+<div id="royals-panel" aria-label="Monarchies and royals list">
+  <div class="disputes-top">
+    <div class="disputes-title">Monarchies &amp; Royals</div>
+    <button id="royals-close" class="disputes-x" type="button" aria-label="Close royals list">×</button>
+  </div>
+  <div class="disputes-note">Every sovereign state with a royal head of state — 43 countries, from hereditary kingdoms to elective thrones. Details reflect mid-2026.</div>
+  <div class="disputes-quiz-row">
+    <button id="start-royals-quiz" class="quiz-start-btn disputes-quiz-btn" type="button">Start royals quiz</button>
+    <label class="disputes-deepcut-row"><input type="checkbox" id="royals-deep-cuts" /> <span>Include deep cuts (harder)</span></label>
+  </div>
+  <div id="royals-list" class="disputes-list"></div>
 </div>
 
 <div id="dispute-info" role="dialog" aria-label="Dispute details">
@@ -749,6 +791,7 @@
     <span class="dispute-info-dragtext">Move me around...</span>
     <button id="dispute-info-close" class="disputes-x" type="button" aria-label="Close dispute details">×</button>
   </div>
+  <img id="dispute-info-photo" alt="" draggable="false" referrerpolicy="no-referrer" />
   <div id="dispute-info-title" class="dispute-info-title"></div>
   <div id="dispute-info-parties" class="dispute-info-parties"></div>
   <div id="dispute-info-text" class="dispute-info-text"></div>
@@ -3482,85 +3525,85 @@ function updateCapitalLabelPlacements() {
 // and every synopsis uses neutral educational framing.
 // Coordinates are [lat, lng]; box = [[south, west], [north, east]]; km = radius.
 const TERRITORIAL_DISPUTES = [
-  { id: 'abkhazia-s-ossetia', name: 'Abkhazia & South Ossetia', parties: 'Georgia · Russia', maxZoom: 7,
+  { id: 'abkhazia-s-ossetia', name: 'Abkhazia & South Ossetia', parties: 'Georgia · Russia', maxZoom: 7, tier: 2,
     synopsis: "Two breakaway regions of Georgia, de facto separate since wars in the early 1990s and the 2008 Russo-Georgian War. Russia and a handful of states recognise them as independent, and Russia garrisons both; Georgia and nearly all UN members regard them as Russian-occupied Georgian territory.",
     shapes: [ { type: 'box', b: [[42.4, 40.0], [43.6, 42.15]] }, { type: 'box', b: [[42.0, 43.6], [42.85, 44.75]] } ] },
-  { id: 'abyei', name: 'Abyei', parties: 'Sudan · South Sudan', maxZoom: 8,
+  { id: 'abyei', name: 'Abyei', parties: 'Sudan · South Sudan', maxZoom: 8, tier: 3,
     synopsis: "An oil-producing border area claimed by both Sudan and South Sudan since the South's independence in 2011. A planned referendum on which country it should join has never been held, and a UN peacekeeping force (UNISFA) has patrolled the area since 2011.",
     shapes: [ { type: 'box', b: [[9.35, 27.7], [10.05, 29.1]] } ] },
-  { id: 'aegean', name: 'Aegean Sea', parties: 'Greece · Türkiye', maxZoom: 7,
+  { id: 'aegean', name: 'Aegean Sea', parties: 'Greece · Türkiye', maxZoom: 7, tier: 2,
     synopsis: "Greece and Türkiye dispute maritime boundaries, airspace and the continental shelf in the Aegean, along with sovereignty over some islets — notably Imia/Kardak, which brought them close to war in 1996. Tensions periodically flare over energy exploration and territorial-water limits.",
     shapes: [ { type: 'box', b: [[35.6, 24.8], [39.6, 27.6]] }, { type: 'circle', c: [37.05, 27.15], km: 6 } ] },
-  { id: 'antarctica', name: 'Antarctica', parties: 'Seven claimant states', maxZoom: 3,
+  { id: 'antarctica', name: 'Antarctica', parties: 'Seven claimant states', maxZoom: 3, tier: 1,
     synopsis: "Argentina, Australia, Chile, France, New Zealand, Norway and the UK claim sectors of Antarctica, with the British, Chilean and Argentine claims overlapping. The 1959 Antarctic Treaty freezes all claims, bars new ones and reserves the continent for peaceful scientific use; most countries recognise none of the claims.",
     shapes: [ { type: 'box', b: [[-85, -179.9], [-60, 179.9]] } ] },
-  { id: 'belize', name: 'Belize (southern claim)', parties: 'Guatemala · Belize', maxZoom: 8,
+  { id: 'belize', name: 'Belize (southern claim)', parties: 'Guatemala · Belize', maxZoom: 8, tier: 3,
     synopsis: "Guatemala claims roughly half of Belize's territory, an inheritance from nineteenth-century treaty disagreements with Britain. Both countries voted by referendum in 2018–19 to send the claim to the International Court of Justice, where the case is being heard; Belize administers all of the territory.",
     shapes: [ { type: 'box', b: [[15.88, -89.24], [17.2, -88.09]] } ] },
-  { id: 'cambodia-thailand', name: 'Cambodia–Thailand border', parties: 'Cambodia · Thailand', maxZoom: 8,
+  { id: 'cambodia-thailand', name: 'Cambodia–Thailand border', parties: 'Cambodia · Thailand', maxZoom: 8, tier: 3,
     synopsis: "Stretches of the 800 km border drawn by Franco-Siamese treaties of 1904–07 were never fully demarcated. The ICJ awarded the Preah Vihear temple to Cambodia in 1962, but nearby areas remain contested: fighting in 2025 killed over a hundred people before a fragile ceasefire, and Cambodia has again turned to international courts.",
     shapes: [ { type: 'box', b: [[14.1, 102.3], [14.75, 105.65]] }, { type: 'circle', c: [14.39, 104.68], km: 18 } ] },
-  { id: 'ceuta-melilla', name: 'Ceuta & Melilla', parties: 'Spain · Morocco', maxZoom: 9,
+  { id: 'ceuta-melilla', name: 'Ceuta & Melilla', parties: 'Spain · Morocco', maxZoom: 9, tier: 2,
     synopsis: "Two Spanish cities on the North African coast, under Spanish rule since the fifteenth and sixteenth centuries — predating the modern Moroccan state — but claimed by Morocco as colonial remnants. Spain considers them integral parts of its territory; they form the EU's only land borders with Africa.",
     shapes: [ { type: 'circle', c: [35.889, -5.316], km: 6 }, { type: 'circle', c: [35.293, -2.938], km: 6 } ] },
-  { id: 'ukraine', name: 'Crimea & occupied Ukraine', parties: 'Ukraine · Russia', maxZoom: 6,
+  { id: 'ukraine', name: 'Crimea & occupied Ukraine', parties: 'Ukraine · Russia', maxZoom: 6, tier: 1,
     synopsis: "Russia occupied and annexed Crimea in 2014 and claims four more Ukrainian regions — Donetsk, Luhansk, Zaporizhzhia and Kherson — annexed in 2022 during its full-scale invasion, without controlling all of them. Ukraine and the overwhelming majority of UN members recognise all five as Ukrainian territory; the war continues.",
     shapes: [
       { type: 'poly', coords: [[45.3, 32.4], [46.2, 32.5], [46.4, 33.7], [46.15, 35.1], [45.45, 36.65], [44.4, 35.4], [44.4, 33.5]] },
       { type: 'poly', coords: [[46.0, 32.2], [46.6, 32.3], [47.3, 33.8], [47.0, 35.3], [47.85, 36.6], [48.9, 38.0], [50.1, 38.2], [49.25, 40.2], [47.65, 39.95], [47.05, 38.35], [46.35, 36.6], [45.9, 34.6]] }
     ] },
-  { id: 'cyprus', name: 'Cyprus (northern)', parties: 'Cyprus · Türkiye', maxZoom: 8,
+  { id: 'cyprus', name: 'Cyprus (northern)', parties: 'Cyprus · Türkiye', maxZoom: 8, tier: 1,
     synopsis: "The island has been divided since Türkiye's 1974 invasion, which followed a Greek-backed coup. The northern third declared itself the 'Turkish Republic of Northern Cyprus', recognised only by Türkiye; the Republic of Cyprus is internationally recognised as sovereign over the whole island, and a UN buffer zone separates the two.",
     shapes: [ { type: 'box', b: [[35.03, 32.6], [35.72, 34.62]] } ] },
-  { id: 'dokdo', name: 'Dokdo / Takeshima', parties: 'South Korea · Japan', maxZoom: 9,
+  { id: 'dokdo', name: 'Dokdo / Takeshima', parties: 'South Korea · Japan', maxZoom: 9, tier: 3,
     synopsis: "A pair of rocky islets in the Sea of Japan (East Sea), administered by South Korea since the 1950s with a small permanent presence, and claimed by Japan. The dispute is entangled with the legacy of Japan's 1910–45 colonisation of Korea; South Korea rejects Japanese proposals to take the question to the ICJ.",
     shapes: [ { type: 'circle', c: [37.242, 131.867], km: 8 } ] },
-  { id: 'essequibo', name: 'Essequibo (Guayana Esequiba)', parties: 'Venezuela · Guyana', maxZoom: 6,
+  { id: 'essequibo', name: 'Essequibo (Guayana Esequiba)', parties: 'Venezuela · Guyana', maxZoom: 6, tier: 2,
     synopsis: "Venezuela claims all territory west of the Essequibo River — about two-thirds of Guyana — rejecting the 1899 arbitration award that set the current border. The dispute intensified after major offshore oil discoveries; the ICJ is hearing the case, while Guyana administers the entire region.",
     shapes: [ { type: 'poly', coords: [[8.55, -61.4], [8.4, -60.0], [7.3, -58.5], [6.4, -58.6], [5.2, -58.9], [4.0, -58.5], [1.45, -58.9], [1.7, -59.65], [2.6, -60.7], [4.2, -61.4], [5.9, -61.15], [7.2, -61.5]] } ] },
-  { id: 'falklands', name: 'Falkland Islands (Malvinas)', parties: 'United Kingdom · Argentina', maxZoom: 7,
+  { id: 'falklands', name: 'Falkland Islands (Malvinas)', parties: 'United Kingdom · Argentina', maxZoom: 7, tier: 1,
     synopsis: "A UK overseas territory in the South Atlantic claimed by Argentina, which calls the islands Las Malvinas. Argentina's 1982 invasion led to a ten-week war won by Britain. In a 2013 referendum islanders voted almost unanimously to remain British; Argentina maintains its claim at the UN.",
     shapes: [ { type: 'box', b: [[-53.2, -61.6], [-50.9, -57.5]] } ] },
-  { id: 'gibraltar', name: 'Gibraltar', parties: 'United Kingdom · Spain', maxZoom: 9,
+  { id: 'gibraltar', name: 'Gibraltar', parties: 'United Kingdom · Spain', maxZoom: 9, tier: 1,
     synopsis: "A British overseas territory at the mouth of the Mediterranean, ceded by Spain in the 1713 Treaty of Utrecht but claimed by Spain ever since. Gibraltarians rejected shared sovereignty by referendum in 2002; recent talks have focused on the territory's post-Brexit relationship with Spain and the EU.",
     shapes: [ { type: 'circle', c: [36.135, -5.35], km: 5 } ] },
-  { id: 'golan', name: 'Golan Heights', parties: 'Syria · Israel', maxZoom: 9,
+  { id: 'golan', name: 'Golan Heights', parties: 'Syria · Israel', maxZoom: 9, tier: 2,
     synopsis: "A strategic plateau captured by Israel from Syria in the 1967 war and effectively annexed in 1981 — a move recognised only by the United States, in 2019. Syria demands its return, and the UN considers it occupied Syrian territory; a UN observer force has monitored the 1974 ceasefire line.",
     shapes: [ { type: 'box', b: [[32.65, 35.55], [33.3, 35.95]] } ] },
-  { id: 'halaib-bir-tawil', name: "Hala'ib Triangle & Bir Tawil", parties: 'Egypt · Sudan', maxZoom: 7,
+  { id: 'halaib-bir-tawil', name: "Hala'ib Triangle & Bir Tawil", parties: 'Egypt · Sudan', maxZoom: 7, tier: 3,
     synopsis: "Two colonial boundary lines drawn in 1899 and 1902 disagree, so Egypt and Sudan each claim the Red Sea coastal Hala'ib Triangle, which Egypt administers — while neither claims the small inland quadrilateral of Bir Tawil, one of the only land areas on Earth unclaimed by any state.",
     shapes: [ { type: 'poly', coords: [[22.0, 33.9], [23.6, 35.4], [22.85, 36.9], [22.0, 36.9]] }, { type: 'poly', coords: [[21.8, 33.16], [22.0, 33.18], [22.0, 34.16], [21.87, 34.09]] } ] },
-  { id: 'india-china', name: 'India–China frontier', parties: 'India · China', maxZoom: 5,
+  { id: 'india-china', name: 'India–China frontier', parties: 'India · China', maxZoom: 5, tier: 2,
     synopsis: "The world's longest disputed border. China administers Aksai Chin, which India claims as part of Ladakh; India administers Arunachal Pradesh, which China claims as 'South Tibet'. A 1962 war and deadly 2020 clashes punctuate decades of standoff along the undemarcated Line of Actual Control.",
     shapes: [ { type: 'box', b: [[34.3, 77.8], [36.0, 80.4]] }, { type: 'box', b: [[26.7, 91.6], [29.45, 97.4]] } ] },
-  { id: 'israel-palestine', name: 'Israeli–Palestinian territories', parties: 'Israel · State of Palestine', maxZoom: 8,
+  { id: 'israel-palestine', name: 'Israeli–Palestinian territories', parties: 'Israel · State of Palestine', maxZoom: 8, tier: 1,
     synopsis: "Israel captured the West Bank, East Jerusalem and the Gaza Strip in the 1967 war. Palestinians seek these territories for a future state, a position backed by most UN members; Israel has annexed East Jerusalem and built settlements the UN considers illegal under international law. Decades of negotiations and repeated wars have not produced an agreed border.",
     shapes: [ { type: 'poly', coords: [[32.55, 34.98], [32.4, 35.57], [31.75, 35.55], [31.35, 35.45], [31.35, 34.88], [31.85, 34.95]] }, { type: 'box', b: [[31.22, 34.2], [31.6, 34.57]] } ] },
-  { id: 'kashmir', name: 'Kashmir', parties: 'India · Pakistan · China', maxZoom: 6,
+  { id: 'kashmir', name: 'Kashmir', parties: 'India · Pakistan · China', maxZoom: 6, tier: 1,
     synopsis: "The former princely state has been disputed since the 1947 partition of British India and has caused several India–Pakistan wars. India and Pakistan each administer part, divided by the heavily militarised Line of Control, while China holds Aksai Chin in the east. Both India and Pakistan claim the region in full.",
     shapes: [ { type: 'poly', coords: [[33.0, 73.8], [32.6, 75.3], [32.4, 76.9], [33.4, 78.9], [34.3, 80.3], [35.6, 80.1], [36.2, 78.1], [37.1, 75.5], [36.9, 74.0], [35.9, 73.3], [34.4, 73.4]] } ] },
-  { id: 'korea', name: 'Korean Peninsula', parties: 'South Korea · North Korea', maxZoom: 6,
+  { id: 'korea', name: 'Korean Peninsula', parties: 'South Korea · North Korea', maxZoom: 6, tier: 1,
     synopsis: "North and South Korea each claim to be the legitimate government of the entire peninsula, divided since 1945 and separated by the Demilitarised Zone along the 1953 armistice line. No peace treaty has ever formally ended the Korean War.",
     shapes: [ { type: 'box', b: [[33.1, 124.3], [43.05, 130.95]] } ] },
-  { id: 'kosovo', name: 'Kosovo', parties: 'Kosovo · Serbia', maxZoom: 8,
+  { id: 'kosovo', name: 'Kosovo', parties: 'Kosovo · Serbia', maxZoom: 8, tier: 1,
     synopsis: "A former province of Serbia that declared independence in 2008, nine years after the NATO intervention that ended the Kosovo War. It is recognised by around half of UN members, including most Western states; Serbia, backed by Russia and China, still claims it, and EU-mediated normalisation talks continue.",
     shapes: [ { type: 'box', b: [[41.85, 20.0], [43.27, 21.8]] } ] },
-  { id: 'kurils', name: 'Kuril Islands / Northern Territories', parties: 'Russia · Japan', maxZoom: 7,
+  { id: 'kurils', name: 'Kuril Islands / Northern Territories', parties: 'Russia · Japan', maxZoom: 7, tier: 2,
     synopsis: "The Soviet Union occupied the island chain northeast of Hokkaido in 1945; Japan claims the four southernmost islands, which it calls the Northern Territories. The dispute has prevented Russia and Japan from ever signing a World War II peace treaty.",
     shapes: [ { type: 'box', b: [[43.3, 145.35], [45.6, 149.1]] } ] },
-  { id: 'rockall', name: 'Rockall', parties: 'United Kingdom · Ireland · Denmark · Iceland', maxZoom: 7,
+  { id: 'rockall', name: 'Rockall', parties: 'United Kingdom · Ireland · Denmark · Iceland', maxZoom: 7, tier: 1,
     synopsis: "An uninhabitable granite islet about 400 km northwest of Donegal, annexed by the UK in 1955. Ireland does not recognise UK sovereignty over the rock and disputes the exclusion of Irish boats — many from Donegal — from its surrounding waters, while Denmark (for the Faroe Islands) and Iceland contest seabed rights across the wider Rockall Plateau.",
     shapes: [ { type: 'circle', c: [57.596, -13.687], km: 15 }, { type: 'circle', c: [57.596, -13.687], km: 200 } ] },
-  { id: 'senkaku', name: 'Senkaku / Diaoyu Islands', parties: 'Japan · China · Taiwan', maxZoom: 8,
+  { id: 'senkaku', name: 'Senkaku / Diaoyu Islands', parties: 'Japan · China · Taiwan', maxZoom: 8, tier: 2,
     synopsis: "Uninhabited East China Sea islets administered by Japan and claimed by both China and Taiwan, which call them Diaoyu and Diaoyutai. Tensions sharpened after Japan's government purchased three of the islands in 2012; Chinese vessels now regularly patrol nearby waters.",
     shapes: [ { type: 'circle', c: [25.77, 123.5], km: 30 } ] },
-  { id: 'south-china-sea', name: 'South China Sea (Spratly & Paracel)', parties: 'China · Taiwan · Vietnam · Philippines · Malaysia · Brunei', maxZoom: 6,
+  { id: 'south-china-sea', name: 'South China Sea (Spratly & Paracel)', parties: 'China · Taiwan · Vietnam · Philippines · Malaysia · Brunei', maxZoom: 6, tier: 2,
     synopsis: "Six governments hold overlapping claims to islands, reefs and waters of the South China Sea. China's expansive 'nine-dash line' claim was rejected by a 2016 international tribunal ruling that it disregards; several claimants, above all China, have built military outposts on artificial islands.",
     shapes: [ { type: 'box', b: [[7.5, 111.5], [11.5, 117.5]] }, { type: 'circle', c: [16.5, 112.0], km: 130 }, { type: 'circle', c: [15.15, 117.75], km: 45 } ] },
-  { id: 'taiwan', name: 'Taiwan', parties: "People's Republic of China · Republic of China (Taiwan)", maxZoom: 7,
+  { id: 'taiwan', name: 'Taiwan', parties: "People's Republic of China · Republic of China (Taiwan)", maxZoom: 7, tier: 1,
     synopsis: "The People's Republic of China claims Taiwan as a province and has not ruled out using force to take it. Taiwan — the Republic of China — has been separately governed since 1949, with its own democratic government and military; only about a dozen states recognise it, while most others, including the US, maintain unofficial ties under 'one China' policies.",
     shapes: [ { type: 'box', b: [[21.8, 119.2], [25.4, 122.1]] } ] },
-  { id: 'western-sahara', name: 'Western Sahara', parties: 'Morocco · Sahrawi Arab Democratic Republic', maxZoom: 6,
+  { id: 'western-sahara', name: 'Western Sahara', parties: 'Morocco · Sahrawi Arab Democratic Republic', maxZoom: 6, tier: 1,
     synopsis: "A former Spanish colony still on the UN list of non-self-governing territories. Morocco controls and claims most of it; the Polisario Front's Sahrawi Arab Democratic Republic, based in Algerian-hosted camps and a strip east of Morocco's sand berm, seeks independence. A UN-promised referendum has never been held.",
     shapes: [ { type: 'poly', coords: [[27.67, -13.2], [27.67, -8.67], [25.0, -8.67], [21.34, -13.0], [21.34, -16.95], [23.0, -16.2], [26.0, -14.6], [27.1, -13.4]] } ] },
   { id: 'belgium-flanders-wallonia', name: 'Belgium: Flanders & Wallonia', parties: 'Belgian federal state · Flemish, Francophone & German-speaking communities', kind: 'Internal identity / federalism', maxZoom: 7,
@@ -3645,8 +3688,10 @@ function clearDisputeHighlight() {
 function closeDisputeInfo() {
   const el = disputeInfoEl();
   const wasOpen = !!(el && el.classList.contains('active'));
-  if (el) el.classList.remove('active');
+  if (el) { el.classList.remove('active'); el.classList.remove('quiz-docked'); }
   clearDisputeHighlight();
+  clearRoyalHighlight();
+  hideInfoCardPhoto();
   return wasOpen;
 }
 function closeDisputesUI() {
@@ -3660,6 +3705,7 @@ function closeDisputesUI() {
 function openDisputesPanel() {
   if (!map) return;
   if (quizState) stopQuiz(false);
+  closeRoyalsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -3721,6 +3767,9 @@ function selectDispute(id) {
     bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
   });
   if (bounds && bounds.isValid()) map.flyToBounds(bounds.pad(0.4), { maxZoom: d.maxZoom || 7, duration: 0.9 });
+  hideInfoCardPhoto();
+  const infoElBrowse = disputeInfoEl();
+  if (infoElBrowse) infoElBrowse.classList.remove('quiz-docked');
   const t = document.getElementById('dispute-info-title');
   if (t) t.textContent = d.name;
   const p = document.getElementById('dispute-info-parties');
@@ -3732,6 +3781,836 @@ function selectDispute(id) {
   hideHoverLabel();
   map.closePopup();
   openId = null;
+}
+// ---------- Disputes quiz ----------
+// Multiple-choice quiz built from TERRITORIAL_DISPUTES. Internal identity/autonomy
+// entries (those with a `kind`) stay browse-only, and prompts stay framing-neutral:
+// questions ask what a region is called or who the parties are, never who it
+// "belongs to". Tiers: 1 headline, 2 regional, 3 deep cut (off by default).
+const DISPUTE_CLUES_PER_ROUND = 2;
+function disputeQuizEligible(d) { return !d.kind; }
+function disputeQuizPool(includeDeepCuts) {
+  return TERRITORIAL_DISPUTES.filter(function(d) { return disputeQuizEligible(d) && (includeDeepCuts || (d.tier || 3) <= 2); });
+}
+function disputesDeepCutsOn() {
+  const el = document.getElementById('disputes-deep-cuts');
+  return !!(el && el.checked);
+}
+function disputeShapeBounds(shape) {
+  if (shape.type === 'circle') return L.latLng(shape.c).toBounds(shape.km * 2000);
+  if (shape.type === 'box') return L.latLngBounds(shape.b);
+  return L.latLngBounds(shape.coords);
+}
+function disputeBounds(d) {
+  let bounds = null;
+  for (const s of (d && d.shapes) || []) {
+    let b = null;
+    try { b = disputeShapeBounds(s); } catch (err) { b = null; }
+    if (b && b.isValid && b.isValid()) bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+  }
+  return bounds && bounds.isValid && bounds.isValid() ? bounds : null;
+}
+const DISPUTE_MASK_STOP = new Set(['ISLAND','ISLANDS','SEA','PENINSULA','TRIANGLE','FRONTIER','BORDER','TERRITORIES','TERRITORY','HEIGHTS','SOUTHERN','NORTHERN','OCCUPIED','CLAIM','QUESTION']);
+const DISPUTE_MASK_ABSORB = new Set(['SEA','SEAS','ISLAND','ISLANDS','ISLE','ISLES','PENINSULA','HEIGHTS','TRIANGLE','STRAIT','STRAITS','GULF','VALLEY','CORRIDOR','TERRITORY','TERRITORIES','REGION','PLATEAU','BANK','RIDGE','SHELF','NORTH','SOUTH','EAST','WEST','NORTHERN','SOUTHERN','EASTERN','WESTERN']);
+function nameStemsFrom(nameString, stopSet) {
+  const stems = [];
+  for (const raw of String(nameString || '').split(/[^A-Za-zÀ-ÖØ-öø-ÿ]+/)) {
+    if (raw.length < 4 || stopSet.has(raw.toUpperCase())) continue;
+    stems.push(raw.slice(0, Math.min(raw.length, 5)).toUpperCase());
+  }
+  return stems;
+}
+function maskTextWithNameSources(sources, text, stopSet) {
+  // Masks any of the given names in the text without leaking structure:
+  // adjacent generic/direction words (Sea, Heights, North...) and short
+  // capitalised particles (Las, Al, El...) are absorbed into the redaction,
+  // verbatim multi-word name phrases are caught even when their words are
+  // individually generic, and consecutive blanks collapse to a single one
+  // so word count says nothing.
+  const stop = stopSet || DISPUTE_MASK_STOP;
+  const stems = [];
+  const pairs = [];
+  for (const src of sources || []) {
+    for (const st of nameStemsFrom(src, stop)) { if (stems.indexOf(st) === -1) stems.push(st); }
+    const toks = String(src || '').split(/[^A-Za-zÀ-ÖØ-öø-ÿ]+/).filter(function(t) { return t.length >= 3; }).map(function(t) { return t.toUpperCase(); });
+    for (let j = 0; j + 1 < toks.length; j++) pairs.push([toks[j], toks[j + 1]]);
+  }
+  const raw = String(text || '');
+  if (!stems.length && !pairs.length) return raw;
+  const wordRe = /[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ'\u2019-]*/g;
+  const tokens = [];
+  let last = 0, m;
+  while ((m = wordRe.exec(raw)) !== null) {
+    if (m.index > last) tokens.push({ word: false, s: raw.slice(last, m.index) });
+    tokens.push({ word: true, s: m[0] });
+    last = m.index + m[0].length;
+  }
+  if (last < raw.length) tokens.push({ word: false, s: raw.slice(last) });
+  const keyOf = function(w) { return w.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z]/g, '').toUpperCase(); };
+  const connectorOnly = function(s) { return /^[\s&\/\-\u2013\u2014]*$/.test(s); };
+  const wordIdx = [];
+  tokens.forEach(function(t, i) { if (t.word) wordIdx.push(i); });
+  const masked = tokens.map(function(t) { return t.word && stems.some(function(st) { return keyOf(t.s).startsWith(st); }); });
+  for (let wi = 0; wi + 1 < wordIdx.length; wi++) {
+    const a = wordIdx[wi], b = wordIdx[wi + 1];
+    let between = '';
+    for (let k = a + 1; k < b; k++) between += tokens[k].s;
+    if (!connectorOnly(between)) continue;
+    const k1 = keyOf(tokens[a].s), k2 = keyOf(tokens[b].s);
+    for (let j = 0; j < pairs.length; j++) {
+      if (k1.startsWith(pairs[j][0]) && k2.startsWith(pairs[j][1])) { masked[a] = true; masked[b] = true; break; }
+    }
+  }
+  const adjacentMasked = function(wi) {
+    for (const dir of [-1, 1]) {
+      const nj = wi + dir;
+      if (nj < 0 || nj >= wordIdx.length) continue;
+      if (!masked[wordIdx[nj]]) continue;
+      const a = Math.min(wordIdx[wi], wordIdx[nj]), b = Math.max(wordIdx[wi], wordIdx[nj]);
+      let between = '';
+      for (let k = a + 1; k < b; k++) between += tokens[k].s;
+      if (connectorOnly(between)) return true;
+    }
+    return false;
+  };
+  for (let pass = 0; pass < 3; pass++) {
+    let changed = false;
+    for (let wi = 0; wi < wordIdx.length; wi++) {
+      const ti = wordIdx[wi];
+      if (masked[ti]) continue;
+      const w = tokens[ti].s;
+      const shortCap = w.length <= 3 && /^[A-ZÀ-Ö]/.test(w);
+      if ((DISPUTE_MASK_ABSORB.has(keyOf(w)) || shortCap) && adjacentMasked(wi)) { masked[ti] = true; changed = true; }
+    }
+    if (!changed) break;
+  }
+  let out = '';
+  for (let i = 0; i < tokens.length; i++) out += masked[i] ? '_____' : tokens[i].s;
+  return out.replace(/_____(?:[\s&\/\-\u2013\u2014]+_____)+/g, '_____');
+}
+function disputeMaskStems(d) { return nameStemsFrom(d.name, DISPUTE_MASK_STOP); }
+function maskedDisputeSynopsis(d) { return maskTextWithNameSources([d.name], d.synopsis, DISPUTE_MASK_STOP); }
+function disputePartyTokens(d) {
+  const skip = new Set(['ARAB','REPUBLIC','DEMOCRATIC','STATE','STATES','SEVEN','CLAIMANT','PEOPLE','PEOPLES','UNITED']);
+  const out = new Set();
+  for (const t of String(d.parties || '').split(/[^A-Za-zÀ-ÖØ-öø-ÿ]+/)) {
+    if (t.length >= 4 && !skip.has(t.toUpperCase())) out.add(norm(t));
+  }
+  return out;
+}
+function disputeClueOptions(d, all) {
+  // Prefer wrong answers that share a party with the correct dispute, so the
+  // parties still visible in the masked synopsis do not give the answer away.
+  const mine = disputePartyTokens(d);
+  const related = [], others = [];
+  for (const o of all) {
+    if (o.id === d.id) continue;
+    let shares = false;
+    for (const t of disputePartyTokens(o)) { if (mine.has(t)) { shares = true; break; } }
+    (shares ? related : others).push(o.name);
+  }
+  const seen = new Set([norm(d.name)]);
+  const out = [d.name];
+  for (const v of shuffleCopy(related).concat(shuffleCopy(others))) {
+    const k = norm(v);
+    if (!k || seen.has(k)) continue;
+    seen.add(k); out.push(v);
+    if (out.length === 4) break;
+  }
+  return shuffleCopy(out);
+}
+function buildDisputeQuestions(subjectPool, allEligible) {
+  const pool = shuffleCopy(subjectPool);
+  const targetCount = Math.min(QUIZ_TOTAL_QUESTIONS, Math.max(1, pool.length));
+  const namePool = allEligible.map(function(d) { return d.name; });
+  const partiesPool = allEligible.map(function(d) { return d.parties; });
+  const indices = [];
+  for (let i = 0; i < targetCount; i++) indices.push(i);
+  const clueSlots = new Set(targetCount >= 3 ? sample(indices, Math.min(DISPUTE_CLUES_PER_ROUND, targetCount)) : []);
+  const questions = [];
+  for (let i = 0; i < targetCount; i++) {
+    const d = pool[i % pool.length];
+    const candidate = { key: 'dispute:' + d.id, name: d.name, dispute: d };
+    if (clueSlots.has(i)) {
+      questions.push({
+        type: 'dispute-clue', candidate,
+        prompt: 'Mystery region — identify it from its story',
+        instruction: '\u201C' + maskedDisputeSynopsis(d) + '\u201D — choose the answer below, tap it or press 1\u20134.',
+        options: disputeClueOptions(d, allEligible),
+        answer: d.name
+      });
+    } else if (Math.random() < 0.5) {
+      questions.push({
+        type: 'dispute-name', candidate,
+        prompt: 'What is this highlighted disputed region called?',
+        instruction: 'Outlines are approximate. Choose the correct answer — tap it or press 1\u20134.',
+        options: optionSet(d.name, namePool),
+        answer: d.name
+      });
+    } else {
+      questions.push({
+        type: 'dispute-parties', candidate,
+        prompt: 'Who are the parties involved in this highlighted dispute?',
+        instruction: 'The region is highlighted on the map — outlines are approximate. Choose the correct answer, tap it or press 1\u20134.',
+        options: optionSet(d.parties, partiesPool),
+        answer: d.parties
+      });
+    }
+  }
+  return questions;
+}
+function showDisputeQuizInfo(d) {
+  if (!d) return;
+  hideInfoCardPhoto();
+  const t = document.getElementById('dispute-info-title');
+  if (t) t.textContent = d.name;
+  const p = document.getElementById('dispute-info-parties');
+  if (p) p.textContent = d.kind ? `${d.kind} \u00B7 ${d.parties}` : d.parties;
+  const s = document.getElementById('dispute-info-text');
+  if (s) s.textContent = d.synopsis;
+  const infoEl = disputeInfoEl();
+  if (infoEl) { infoEl.classList.add('active'); infoEl.classList.add('quiz-docked'); }
+}
+function startDisputesQuiz() { beginDisputesQuiz(null); }
+function beginDisputesQuiz(disputeSubset) {
+  if (!map) return;
+  hideHoverLabel(); map.closePopup(); openId = null;
+  closeDisputesUI();
+  closeRoyalsUI();
+  if (mapMode !== 'world') {
+    const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
+    if (worldRadio) worldRadio.checked = true;
+    mapMode = 'world';
+    applyMapMode(true);
+  }
+  const allEligible = TERRITORIAL_DISPUTES.filter(disputeQuizEligible);
+  const pool = (disputeSubset && disputeSubset.length) ? disputeSubset : disputeQuizPool(disputesDeepCutsOn());
+  if (allEligible.length < 4 || !pool.length) return;
+  quizState = { mode: mapMode, kind: 'disputes', questions: buildDisputeQuestions(pool, allEligible), index: 0, score: 0, locked: false, awaitingMapClick: false };
+  renderQuizQuestion();
+}
+
+// ROYAL_MONARCHIES — all sovereign states with a royal head of state (July 2026).
+// tier: 1 headline, 2 regional, 3 deep cut. realm: Commonwealth realm under Charles III.
+// match: normalised aliases resolved against the world layer at runtime.
+// c/km: fallback circle if no polygon resolves. mask: extra tokens hidden in quiz clues.
+const ROYAL_MONARCHIES = [
+  // ---- Europe ----
+  { id: 'uk', name: 'United Kingdom', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Constitutional monarchy', tier: 1, realm: true,
+    match: ['United Kingdom', 'England', 'Scotland', 'Wales', 'Northern Ireland'], c: [54.2, -2.6], km: 420, mask: ['British', 'Britain', 'Charles'],
+    synopsis: "Charles III acceded in September 2022 on the death of Elizabeth II, history's longest-reigning British monarch. The Crown traces its line to the tenth century; the sovereign also heads the Church of England and the Commonwealth, while Westminster's conventions leave day-to-day power entirely with Parliament." },
+  { id: 'spain', name: 'Spain', monarch: 'King Felipe VI', title: 'King', house: 'Bourbon', since: 2014, wiki: 'Felipe VI of Spain', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Spain', 'Kingdom of Spain'], c: [40.2, -3.6], km: 480, mask: ['Spanish'],
+    synopsis: "The Bourbon monarchy was restored in 1975 after Franco's death, with Juan Carlos I steering the transition to democracy. Felipe VI took the throne in 2014 after his father abdicated amid scandal, and later renounced his father's inheritance as the old king moved abroad." },
+  { id: 'netherlands', name: 'Netherlands', monarch: 'King Willem-Alexander', title: 'King', house: 'Orange-Nassau', since: 2013, wiki: 'Willem-Alexander of the Netherlands', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Netherlands', 'Kingdom of the Netherlands'], c: [52.2, 5.4], km: 170, mask: ['Dutch'],
+    synopsis: "Willem-Alexander became the first king in 123 years when Beatrix abdicated in 2013 — stepping down is practically a tradition of the House of Orange-Nassau. King's Day turns the whole country orange every April; the monarch's role is strictly ceremonial." },
+  { id: 'belgium', name: 'Belgium', monarch: 'King Philippe', title: 'King', house: 'Belgium', since: 2013, wiki: 'Philippe of Belgium', kind: 'Constitutional monarchy', tier: 2,
+    match: ['Belgium', 'Kingdom of Belgium'], c: [50.6, 4.6], km: 150, mask: ['Belgian'],
+    synopsis: "A kingdom created in 1830 with a constitution so parliamentary that in 1990 King Baudouin was declared 'unable to reign' for a day rather than sign an abortion law. Philippe has reigned since 2013 over a federal state balancing Dutch- and French-speaking communities." },
+  { id: 'sweden', name: 'Sweden', monarch: 'King Carl XVI Gustaf', title: 'King', house: 'Bernadotte', since: 1973, wiki: 'Carl XVI Gustaf', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Sweden', 'Kingdom of Sweden'], c: [62.2, 15.5], km: 550, mask: ['Swedish'],
+    synopsis: "Carl XVI Gustaf has reigned since 1973 — Europe's longest-serving current monarch — under the Bernadotte dynasty founded by one of Napoleon's marshals. A 1980 law made his eldest child, Crown Princess Victoria, heir through Europe's first equal-primogeniture reform; the constitution leaves the king no political power at all." },
+  { id: 'norway', name: 'Norway', monarch: 'King Harald V', title: 'King', house: 'Glücksburg', since: 1991, wiki: 'Harald V', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Norway', 'Kingdom of Norway'], c: [64.6, 11.5], km: 600, mask: ['Norwegian', 'Norge'],
+    synopsis: "Harald V has reigned since 1991 in a monarchy re-founded by plebiscite in 1905, when a Danish prince took the throne as Haakon VII. The king, an Olympic sailor in his youth, has recently seen the crown prince act as regent during health issues." },
+  { id: 'denmark', name: 'Denmark', monarch: 'King Frederik X', title: 'King', house: 'Glücksburg', since: 2024, wiki: 'Frederik X', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Denmark', 'Kingdom of Denmark'], c: [56.1, 9.5], km: 190, mask: ['Danish'],
+    synopsis: "Frederik X became king in January 2024 when Margrethe II abdicated on live television after 52 years — the first voluntary abdication here since 1146. Claiming descent from Gorm the Old, this is often called Europe's oldest continuous monarchy, with over a thousand years on the throne." },
+  { id: 'luxembourg', name: 'Luxembourg', monarch: 'Grand Duke Guillaume V', title: 'Grand Duke', house: 'Luxembourg-Nassau', since: 2025, wiki: 'Guillaume V, Grand Duke of Luxembourg', kind: 'Constitutional monarchy', tier: 2,
+    match: ['Luxembourg', 'Grand Duchy of Luxembourg'], c: [49.8, 6.1], km: 45, mask: ['Luxembourgish'],
+    synopsis: "The world's only sovereign grand duchy. Guillaume V acceded in October 2025 when his father Henri abdicated after a quarter-century — continuing a pattern, as the two previous monarchs also stepped down voluntarily. The state shared its crown with the Netherlands until 1890, when different succession laws split the thrones." },
+  { id: 'monaco', name: 'Monaco', monarch: 'Prince Albert II', title: 'Sovereign Prince', house: 'Grimaldi', since: 2005, wiki: 'Albert II, Prince of Monaco', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Monaco', 'Principality of Monaco'], c: [43.74, 7.42], km: 4, mask: ['Monegasque'],
+    synopsis: "The Grimaldis have held the rock since 1297, when Francesco 'the Cunning' seized the fortress disguised as a monk. Albert II, son of Hollywood star Grace Kelly, reigns over the world's second-smallest sovereign state, where the prince keeps real executive influence." },
+  { id: 'liechtenstein', name: 'Liechtenstein', monarch: 'Prince Hans-Adam II (Alois regent)', title: 'Sovereign Prince', house: 'Liechtenstein', since: 1989, wiki: 'Hans-Adam II', kind: 'Constitutional monarchy', tier: 2,
+    match: ['Liechtenstein', 'Principality of Liechtenstein'], c: [47.15, 9.55], km: 14, mask: ['Alois'],
+    synopsis: "The princely family bought the county of Vaduz in 1712 and didn't bother visiting for over a century; today they still own the castle above the capital. A 2003 referendum handed Hans-Adam II sweeping powers — including dissolving parliament — making this Europe's most powerful monarchy. His son has run daily affairs as regent since 2004." },
+  { id: 'andorra', name: 'Andorra', monarch: 'Co-Princes: the President of France & the Bishop of Urgell', title: 'Co-Princes', house: '', since: 1278, wiki: 'Co-princes of Andorra', kind: 'Parliamentary co-principality', tier: 2,
+    match: ['Andorra', 'Principality of Andorra'], c: [42.55, 1.56], km: 22, mask: ['Andorran'],
+    synopsis: "A diarchy unlike any other: under a charter of 1278, the heads of state are two co-princes — the Bishop of Urgell in Spain and, today, the President of France. Neither lives in the country, and one of them is democratically elected... by the voters of a different nation." },
+  { id: 'vatican', name: 'Vatican City', monarch: 'Pope Leo XIV', title: 'Pope', house: '', since: 2025, wiki: 'Pope Leo XIV', kind: 'Elective absolute monarchy', tier: 2,
+    match: ['Vatican', 'Vatican City', 'Holy See'], c: [41.904, 12.453], km: 1.2, mask: ['papal', 'papacy'],
+    synopsis: "An elective absolute monarchy where cardinals under eighty choose the sovereign in a conclave sealed inside the Sistine Chapel. Leo XIV, elected in 2025 as the first American pope, reigns over the world's smallest state — 44 hectares whose line of succession stretches back to Saint Peter." },
+  // ---- Middle East & North Africa ----
+  { id: 'saudi-arabia', name: 'Saudi Arabia', monarch: 'King Salman bin Abdulaziz', title: 'King', house: 'Al Saud', since: 2015, wiki: 'Salman of Saudi Arabia', kind: 'Absolute monarchy', tier: 1,
+    match: ['Saudi Arabia', 'Kingdom of Saudi Arabia'], c: [24.2, 45.1], km: 850, mask: ['Saudi'],
+    synopsis: "An absolute monarchy whose king is also Custodian of the Two Holy Mosques. Salman, on the throne since 2015 and born before the kingdom was four years old, is the world's oldest reigning monarch; his son the crown prince runs the government day to day as prime minister." },
+  { id: 'jordan', name: 'Jordan', monarch: 'King Abdullah II', title: 'King', house: 'Hashemite', since: 1999, wiki: 'Abdullah II of Jordan', kind: 'Executive constitutional monarchy', tier: 1,
+    match: ['Jordan', 'Hashemite Kingdom of Jordan'], c: [31.3, 36.6], km: 260, mask: ['Jordanian'],
+    synopsis: "The Hashemite dynasty claims descent from the Prophet Muhammad, and Abdullah II — king since 1999 — holds real executive power, appointing governments and commanding the army. Before the crown, he once appeared in disguise as an extra in an episode of Star Trek: Voyager." },
+  { id: 'morocco', name: 'Morocco', monarch: 'King Mohammed VI', title: 'King', house: 'Alaouite', since: 1999, wiki: 'Mohammed VI of Morocco', kind: 'Executive constitutional monarchy', tier: 1,
+    match: ['Morocco', 'Kingdom of Morocco'], c: [31.9, -6.9], km: 520, mask: ['Moroccan'],
+    synopsis: "The Alaouite dynasty has reigned since the seventeenth century, outlasting both French and Spanish protectorates, and the king carries the religious title 'Commander of the Faithful'. Mohammed VI, on the throne since 1999, conceded some powers after 2011 protests while keeping final say over security and religion." },
+  { id: 'bahrain', name: 'Bahrain', monarch: 'King Hamad bin Isa Al Khalifa', title: 'King', house: 'Al Khalifa', since: 1999, wiki: 'Hamad bin Isa Al Khalifa', kind: 'Executive constitutional monarchy', tier: 2,
+    match: ['Bahrain', 'Kingdom of Bahrain'], c: [26.05, 50.55], km: 40, mask: ['Bahraini'],
+    synopsis: "The Al Khalifa family has ruled the island since 1783. Hamad, who succeeded as emir in 1999, promoted himself to king under a new constitution in 2002; the Gulf's only island kingdom hosts a major US naval base and, with neighbouring troops, put down mass protests in 2011." },
+  { id: 'kuwait', name: 'Kuwait', monarch: 'Emir Mishal Al-Ahmad Al-Sabah', title: 'Emir', house: 'Al Sabah', since: 2023, wiki: 'Mishal Al-Ahmad Al-Jaber Al-Sabah', kind: 'Executive constitutional monarchy', tier: 2,
+    match: ['Kuwait', 'State of Kuwait'], c: [29.3, 47.6], km: 110, mask: ['Kuwaiti'],
+    synopsis: "The Al Sabah have governed since the 1750s under an unusual arrangement: the Gulf's feistiest parliament must approve each new crown prince. Mishal, who acceded in 2023 aged 83, suspended parts of the constitution in 2024 and dissolved that assembly — the region's oldest elected legislature." },
+  { id: 'qatar', name: 'Qatar', monarch: 'Emir Tamim bin Hamad Al Thani', title: 'Emir', house: 'Al Thani', since: 2013, wiki: 'Tamim bin Hamad Al Thani', kind: 'Executive monarchy', tier: 2,
+    match: ['Qatar', 'State of Qatar'], c: [25.3, 51.2], km: 90, mask: ['Qatari'],
+    synopsis: "Tamim bin Hamad became emir in 2013 at just 33, when his father voluntarily stepped aside — a rarity in Gulf monarchies. The Al Thani state weathered a four-year blockade by its own neighbours, hosted a football World Cup, and mediates conflicts from Afghanistan to Gaza." },
+  { id: 'oman', name: 'Oman', monarch: 'Sultan Haitham bin Tariq', title: 'Sultan', house: 'Al Said', since: 2020, wiki: 'Haitham bin Tariq', kind: 'Absolute monarchy', tier: 2,
+    match: ['Oman', 'Sultanate of Oman'], c: [20.6, 56.1], km: 420, mask: ['Omani'],
+    synopsis: "The Al Said sultans once ruled a maritime empire reaching Zanzibar. Haitham bin Tariq succeeded in 2020 after Qaboos — the Arab world's longest-serving ruler — died childless, having named his chosen heir in a sealed envelope opened before the royal family. The sultanate stays studiedly neutral, talking to all sides." },
+  { id: 'uae', name: 'United Arab Emirates', monarch: 'Sheikh Mohamed bin Zayed Al Nahyan', title: 'President', house: 'Al Nahyan', since: 2022, wiki: 'Mohamed bin Zayed Al Nahyan', kind: 'Federal elective monarchy', tier: 2,
+    match: ['United Arab Emirates'], c: [24.0, 54.4], km: 300, mask: ['Emirati'],
+    synopsis: "A federation of seven hereditary sheikhdoms whose rulers elect a president from among themselves — by convention the ruler of Abu Dhabi. Sheikh Mohamed bin Zayed, in office since 2022, presides over a state that didn't exist before 1971 and now runs global ports, airlines and a Mars mission." },
+  // ---- Asia ----
+  { id: 'japan', name: 'Japan', monarch: 'Emperor Naruhito', title: 'Emperor', house: 'Imperial House of Japan', since: 2019, wiki: 'Naruhito', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Japan'], c: [36.6, 138.4], km: 750, mask: ['Japanese'],
+    synopsis: "The Chrysanthemum Throne is the world's oldest continuous hereditary monarchy, counting 126 emperors from semi-legendary origins. Naruhito acceded in 2019, opening the Reiwa era, after his father became the first emperor in two centuries to abdicate; the postwar constitution makes him purely 'the symbol of the State'." },
+  { id: 'thailand', name: 'Thailand', monarch: 'King Vajiralongkorn (Rama X)', title: 'King', house: 'Chakri', since: 2016, wiki: 'Vajiralongkorn', kind: 'Constitutional monarchy', tier: 1,
+    match: ['Thailand', 'Kingdom of Thailand'], c: [15.2, 101.2], km: 550, mask: ['Thai'],
+    synopsis: "The Chakri dynasty has reigned from Bangkok since 1782. Vajiralongkorn — styled Rama X — inherited one of the world's wealthiest crowns in 2016 and spends long stretches in Bavaria; strict lèse-majesté laws make criticising the monarchy punishable by up to fifteen years per count." },
+  { id: 'cambodia', name: 'Cambodia', monarch: 'King Norodom Sihamoni', title: 'King', house: 'Norodom', since: 2004, wiki: 'Norodom Sihamoni', kind: 'Elective constitutional monarchy', tier: 2,
+    match: ['Cambodia', 'Kingdom of Cambodia'], c: [12.6, 104.9], km: 300, mask: [],
+    synopsis: "One of the world's few elective monarchies: a Royal Council of the Throne chose Sihamoni — a former ballet dancer and UNESCO envoy raised in Prague — when his father Sihanouk abdicated in 2004. The crown itself was abolished by the Khmer Rouge and restored in 1993." },
+  { id: 'bhutan', name: 'Bhutan', monarch: 'King Jigme Khesar Namgyel Wangchuck', title: 'King', house: 'Wangchuck', since: 2006, wiki: 'Jigme Khesar Namgyel Wangchuck', kind: 'Constitutional monarchy', tier: 2,
+    match: ['Bhutan', 'Kingdom of Bhutan'], c: [27.4, 90.4], km: 130, mask: ['Bhutanese', 'Druk'],
+    synopsis: "The 'Dragon King' of the Wangchuck dynasty, which unified the Himalayan kingdom in 1907. Jigme Khesar took the throne in 2006 after his father voluntarily abdicated and introduced democracy from above; the state famously measures Gross National Happiness alongside GDP." },
+  { id: 'brunei', name: 'Brunei', monarch: 'Sultan Hassanal Bolkiah', title: 'Sultan', house: 'Bolkiah', since: 1967, wiki: 'Hassanal Bolkiah', kind: 'Absolute monarchy', tier: 2,
+    match: ['Brunei', 'Brunei Darussalam'], c: [4.5, 114.7], km: 90, mask: [],
+    synopsis: "Hassanal Bolkiah has reigned since 1967 — the world's longest-serving current monarch — as absolute sultan, prime minister, finance and defence minister in one. The oil-rich state on Borneo maintains the world's largest residential palace and phased in sharia criminal law from 2014." },
+  { id: 'malaysia', name: 'Malaysia', monarch: 'Sultan Ibrahim of Johor', title: 'Yang di-Pertuan Agong', house: 'Johor', since: 2024, wiki: 'Ibrahim Iskandar of Johor', kind: 'Federal elective monarchy', tier: 2,
+    match: ['Malaysia'], c: [3.9, 109.5], km: 700, mask: ['Agong'],
+    synopsis: "The world's only rotating monarchy: nine hereditary state rulers elect one of themselves as federal head of state for a five-year term. The current holder, a car-collecting billionaire from Johor with his own private army, took the throne in 2024." },
+  // ---- Africa ----
+  { id: 'lesotho', name: 'Lesotho', monarch: 'King Letsie III', title: 'King', house: 'Moshesh', since: 1996, wiki: 'Letsie III', kind: 'Constitutional monarchy', tier: 3,
+    match: ['Lesotho', 'Kingdom of Lesotho'], c: [-29.6, 28.2], km: 140, mask: ['Basotho', 'Sotho'],
+    synopsis: "A mountain kingdom entirely surrounded by South Africa, where Letsie III reigns as a 'living symbol of national unity' with no executive power. The royal line descends from Moshoeshoe I, who gathered peoples fleeing the Zulu wars onto highland strongholds in the 1820s." },
+  { id: 'eswatini', name: 'Eswatini', monarch: 'King Mswati III', title: 'King', house: 'Dlamini', since: 1986, wiki: 'Mswati III', kind: 'Absolute monarchy', tier: 3,
+    match: ['eSwatini', 'Kingdom of eSwatini', 'Swaziland'], c: [-26.5, 31.5], km: 100, mask: ['Swazi', 'Swaziland', 'Mswati'],
+    synopsis: "Africa's last absolute monarchy. The king, crowned in 1986 at eighteen, appoints the government, has more than a dozen wives, and in 2018 renamed the entire country by royal proclamation on his fiftieth birthday. The Dlamini dynasty's Incwala and Reed Dance rituals anchor the national calendar." },
+  // ---- Commonwealth realms beyond the UK ----
+  { id: 'canada', name: 'Canada', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 2, realm: true,
+    match: ['Canada'], c: [58.0, -100.0], km: 1800, mask: ['Charles'],
+    synopsis: "Charles III is separately King of Canada — a legally distinct crown since the 1931 Statute of Westminster — represented by a governor general who is, by modern convention, alternately anglophone and francophone. The 1982 constitution made abolishing the monarchy nearly impossible: all ten provinces plus the federal parliament must agree." },
+  { id: 'australia', name: 'Australia', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 2, realm: true,
+    match: ['Australia', 'Commonwealth of Australia'], c: [-25.5, 134.0], km: 1700, mask: ['Charles'],
+    synopsis: "A 1999 referendum kept the monarchy after republicans split over the alternative model. The monarch's representative, the governor-general, famously dismissed an elected prime minister in 1975 — the Whitlam affair — the sharpest use of the Crown's reserve powers in any realm." },
+  { id: 'new-zealand', name: 'New Zealand', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 2, realm: true,
+    match: ['New Zealand'], c: [-42.0, 172.5], km: 700, mask: ['Charles'],
+    synopsis: "This Realm also covers the Cook Islands and Niue, self-governing states in free association. The Treaty of Waitangi, signed with Māori chiefs in the Crown's name in 1840, remains the founding constitutional document — keeping the monarchy central to indigenous rights debates." },
+  { id: 'jamaica', name: 'Jamaica', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 2, realm: true,
+    match: ['Jamaica'], c: [18.1, -77.3], km: 120, mask: ['Charles'],
+    synopsis: "Charles III remains head of state of the island that gave the world reggae, but its government has tabled a constitutional bill to become a republic — following Barbados, which left the realm in 2021. A referendum is required; polls since independence in 1962 have often favoured an elected president." },
+  { id: 'bahamas', name: 'The Bahamas', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['The Bahamas', 'Bahamas'], c: [24.3, -76.3], km: 300, mask: ['Charles', 'Bahamian'],
+    synopsis: "Charles III is head of state of this 700-island archipelago, independent since 1973; successive prime ministers have flirted with a republic without ever setting a date. Three centuries ago these waters hosted the pirate republic of Nassau — the Crown's writ arrived properly only in 1718." },
+  { id: 'belize', name: 'Belize', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Belize'], c: [17.2, -88.6], km: 130, mask: ['Charles', 'Belizean'],
+    synopsis: "The Crown's only realm on the Central American mainland: formerly British Honduras, independent since 1981, and garrisoned by British troops for years afterwards against a neighbour's territorial claim. Charles III is head of state, represented by a governor-general." },
+  { id: 'papua-new-guinea', name: 'Papua New Guinea', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Papua New Guinea'], c: [-6.5, 145.0], km: 550, mask: ['Charles'],
+    synopsis: "The most linguistically diverse realm on Earth — over 800 languages — where Charles III is head of state, once affectionately described in Tok Pisin as 'nambawan pikinini bilong Misis Kwin': the number-one child of the Queen. Independence from Australian administration came in 1975." },
+  { id: 'solomon-islands', name: 'Solomon Islands', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Solomon Islands'], c: [-9.3, 160.2], km: 380, mask: ['Charles'],
+    synopsis: "Charles III heads this 900-island realm, scene of the Pacific War's Guadalcanal campaign. A 2019 switch of diplomatic recognition to Beijing, followed by riots in the capital, put the governor-general system under strain; republic talk resurfaces periodically." },
+  { id: 'tuvalu', name: 'Tuvalu', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Tuvalu'], c: [-8.0, 178.3], km: 120, mask: ['Charles', 'Tuvaluan'],
+    synopsis: "One of the smallest realms — about 11,000 people on nine atolls — which voted in referendums in 1986 and 2008 to keep the Crown. Rising seas dominate politics here: the state is digitising itself so the nation can persist even if its land does not." },
+  { id: 'grenada', name: 'Grenada', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Grenada'], c: [12.1, -61.68], km: 30, mask: ['Charles', 'Grenadian'],
+    synopsis: "The 'Spice Isle' realm, where the Crown's role survived a 1979 revolution and the US-led intervention that followed in 1983. Charles III is head of state of the island that grows a fifth of the world's nutmeg — the crop appears on the national flag." },
+  { id: 'saint-lucia', name: 'Saint Lucia', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Saint Lucia', 'St. Lucia', 'St Lucia'], c: [13.9, -60.97], km: 28, mask: ['Charles'],
+    synopsis: "A realm that changed hands between France and Britain fourteen times before 1814. Charles III is head of state of an island of under 200,000 people that has produced two Nobel laureates — the highest number per capita of any country in the world." },
+  { id: 'saint-vincent', name: 'Saint Vincent and the Grenadines', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Saint Vincent and the Grenadines', 'St. Vincent and the Grenadines', 'St. Vin. and Gren.'], c: [13.1, -61.2], km: 45, mask: ['Charles', 'Vincentian'],
+    synopsis: "Charles III heads this multi-island realm, which held the Caribbean's only republic referendum so far — voters chose to keep the monarchy in 2009. Its La Soufrière volcano erupted in 2021, forcing a fifth of the population to evacuate." },
+  { id: 'antigua', name: 'Antigua and Barbuda', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Antigua and Barbuda', 'Antigua and Barb.'], c: [17.08, -61.8], km: 35, mask: ['Charles', 'Antiguan'],
+    synopsis: "Within hours of Charles III's accession, the prime minister here pledged a republic referendum 'within three years' — it has yet to happen. A twin-island realm whose tourist board claims a different beach for every day of the year." },
+  { id: 'saint-kitts', name: 'Saint Kitts and Nevis', monarch: 'King Charles III', title: 'King', house: 'Windsor', since: 2022, wiki: 'Charles III', kind: 'Commonwealth realm', tier: 3, realm: true,
+    match: ['Saint Kitts and Nevis', 'St. Kitts and Nevis', 'St. Kitts-Nevis'], c: [17.28, -62.7], km: 26, mask: ['Charles'],
+    synopsis: "The smallest sovereign state in the Americas — a two-island federation where Charles III is head of state, and where the smaller island retains a constitutional right to secede on a two-thirds vote. Settled in 1623, it was Britain's first Caribbean colony." },
+  // ---- Oceania (non-realm) ----
+  { id: 'tonga', name: 'Tonga', monarch: 'King Tupou VI', title: 'King', house: 'Tupou', since: 2012, wiki: 'Tupou VI', kind: 'Constitutional monarchy', tier: 2,
+    match: ['Tonga', 'Kingdom of Tonga'], c: [-21.2, -175.2], km: 90, mask: ['Tongan'],
+    synopsis: "The only sovereign kingdom left among the Pacific islands, and never colonised by a European power. Tupou VI has reigned since 2012 over a monarchy that voluntarily ceded most political power to an elected parliament in 2010; his grandmother Sālote famously charmed London by riding through coronation rain in an open carriage." }
+];
+// ---------- Monarchies & royals ----------
+// Browse panel + quiz over ROYAL_MONARCHIES. Country polygons are resolved from
+// the world layer at runtime via each entry's aliases; unresolved entries fall
+// back to a circle so every monarchy still highlights. The info card is shared
+// with the disputes feature. Tiers: 1 headline, 2 regional, 3 deep cut.
+const ROYAL_MASK_STOP = new Set([...DISPUTE_MASK_STOP, 'KING','KINGS','QUEEN','EMPEROR','EMPRESS','SULTAN','SULTANATE','EMIR','EMIRATE','GRAND','DUKE','DUCHY','PRINCE','PRINCES','PRINCESS','PRINCIPALITY','POPE','SHEIKH','PRESIDENT','BISHOP','REGENT','KINGDOM','UNITED','STATE','STATES','CITY','HOUSE','IMPERIAL','ROYAL','SAINT','COMMONWEALTH','FEDERATION']);
+const ROYAL_CLUES_PER_ROUND = 2;
+let royalHighlightLayer = null;
+let royalsOverlayLayer = null;
+let activeRoyalId = null;
+let royalsListBuilt = false;
+let royalCandidateIndex = null;
+function royalsPanelEl() { return document.getElementById('royals-panel'); }
+function royalsPanelOpen() { const p = royalsPanelEl(); return !!(p && p.classList.contains('active')); }
+function ensureRoyalPane() {
+  if (!map || map.getPane('royalPane')) return;
+  map.createPane('royalPane');
+  const pane = map.getPane('royalPane');
+  pane.style.zIndex = 641;
+  pane.style.pointerEvents = 'none';
+}
+const ROYAL_HIGHLIGHT_STYLE = { pane: 'royalPane', interactive: false, color: '#8a6d1a', weight: 2.5, opacity: 1, fillColor: '#d4a017', fillOpacity: 0.30 };
+const ROYAL_OVERLAY_STYLE = { pane: 'royalPane', interactive: false, color: '#a8862a', weight: 1, opacity: 0.65, fillColor: '#e3b23c', fillOpacity: 0.14 };
+function royalMaskedSynopsis(r) {
+  return maskTextWithNameSources([r.name, r.monarch, r.house].concat(r.mask || []), r.synopsis, ROYAL_MASK_STOP);
+}
+const royalPortraitData = new Map();
+let royalPortraitToken = 0;
+function setInfoCardPhoto(url, alt) {
+  const img = document.getElementById('dispute-info-photo');
+  if (!img) return;
+  if (url) { img.alt = alt || ''; img.src = url; img.classList.add('show'); }
+  else { img.onerror = null; img.onload = null; img.classList.remove('show'); img.removeAttribute('src'); img.alt = ''; }
+}
+function hideInfoCardPhoto() {
+  royalPortraitToken++;
+  setInfoCardPhoto(null);
+}
+function fetchRoyalPortraitData(r) {
+  // Live lead image data from the monarch's Wikipedia article, so portraits
+  // stay current without shipping image files. Resolved answers (including
+  // "article has no image") are cached; network errors are not, so a later
+  // open can retry.
+  if (!r || !r.wiki) return Promise.resolve(null);
+  if (royalPortraitData.has(r.id)) return Promise.resolve(royalPortraitData.get(r.id));
+  return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(r.wiki))
+    .then(function(resp) { return resp && resp.ok ? resp.json() : null; })
+    .then(function(data) {
+      if (!data) return null;
+      const info = data.thumbnail && data.thumbnail.source
+        ? { base: data.thumbnail.source, origW: (data.originalimage && data.originalimage.width) || 0 }
+        : null;
+      royalPortraitData.set(r.id, info);
+      return info;
+    })
+    .catch(function() { return null; });
+}
+function royalPortraitUrls(r, px) {
+  // Returns { sized, base }: `sized` is the thumbnail rescaled for the
+  // requested display width (high-DPI aware, capped at the original image
+  // width); `base` is the API's own guaranteed-served thumbnail, kept as a
+  // fallback in case a rescaled variant will not serve.
+  return fetchRoyalPortraitData(r).then(function(info) {
+    if (!info || !info.base) return null;
+    const target = Math.min(px, info.origW || px);
+    return { sized: info.base.replace(/\/(\d+)px-/, '/' + target + 'px-'), base: info.base };
+  });
+}
+function applyImgWithFallback(img, urls, onFail) {
+  if (!img || !urls) { if (onFail) onFail(); return; }
+  img.onerror = function() {
+    if (urls.base && img.src !== urls.base) {
+      img.onerror = function() { img.onerror = null; if (onFail) onFail(); };
+      img.src = urls.base;
+    } else { img.onerror = null; if (onFail) onFail(); }
+  };
+  img.src = urls.sized || urls.base;
+}
+function loadRoyalPortrait(r) {
+  hideInfoCardPhoto();
+  const token = royalPortraitToken;
+  royalPortraitUrls(r, 360).then(function(urls) {
+    if (token !== royalPortraitToken || !urls) return;
+    const img = document.getElementById('dispute-info-photo');
+    if (!img) return;
+    img.alt = r.monarch;
+    img.classList.add('show');
+    applyImgWithFallback(img, urls, function() {
+      if (token === royalPortraitToken) setInfoCardPhoto(null);
+    });
+  });
+}
+function royalInfoLine(r) {
+  return r.house ? `${r.monarch} · House of ${r.house} · since ${r.since}` : `${r.monarch} · since ${r.since}`;
+}
+function royalMaxZoom(r) {
+  const km = r.km || 300;
+  if (km <= 5) return 15;
+  if (km <= 30) return 11;
+  if (km <= 100) return 9;
+  if (km <= 250) return 7;
+  if (km <= 700) return 6;
+  return 5;
+}
+function rebuildRoyalCandidateIndex() {
+  royalCandidateIndex = new Map();
+  if (!map || mapMode !== 'world') return;
+  for (const c of getVisibleQuizCandidates()) royalCandidateIndex.set(c.key, c);
+}
+function resolveRoyalCandidate(r) {
+  if (!royalCandidateIndex) rebuildRoyalCandidateIndex();
+  const seen = new Set();
+  const features = [], layers = [];
+  for (const alias of r.match || []) {
+    const c = royalCandidateIndex.get(norm(alias));
+    if (!c || seen.has(c)) continue;
+    seen.add(c);
+    for (const f of c.features || []) features.push(f);
+    for (const l of c.layers || []) layers.push(l);
+  }
+  return features.length ? { features, layers } : null;
+}
+function royalQuizCandidate(r) {
+  const res = resolveRoyalCandidate(r);
+  return { key: 'royal:' + r.id, name: r.name, royal: r, features: res ? res.features : [], layers: res ? res.layers : [] };
+}
+function royalFallbackCircle(r, style) {
+  return L.circle(r.c, Object.assign({ radius: r.km * 1000 }, style));
+}
+function clearRoyalHighlight() {
+  if (royalHighlightLayer && map) map.removeLayer(royalHighlightLayer);
+  royalHighlightLayer = null;
+  activeRoyalId = null;
+  const list = document.getElementById('royals-list');
+  if (list) list.querySelectorAll('.dispute-row.active').forEach(function(x) { x.classList.remove('active'); });
+}
+function clearRoyalsOverlay() {
+  if (royalsOverlayLayer && map) map.removeLayer(royalsOverlayLayer);
+  royalsOverlayLayer = null;
+}
+function buildRoyalsOverlay() {
+  clearRoyalsOverlay();
+  if (!map) return;
+  ensureRoyalPane();
+  rebuildRoyalCandidateIndex();
+  const layers = [];
+  for (const r of ROYAL_MONARCHIES) {
+    const res = resolveRoyalCandidate(r);
+    if (res) layers.push(L.geoJSON({ type: 'FeatureCollection', features: res.features }, { pane: 'royalPane', interactive: false, style: ROYAL_OVERLAY_STYLE }));
+    else layers.push(royalFallbackCircle(r, ROYAL_OVERLAY_STYLE));
+  }
+  royalsOverlayLayer = L.layerGroup(layers).addTo(map);
+}
+function closeRoyalsUI() {
+  const p = royalsPanelEl();
+  const wasOpen = !!(p && p.classList.contains('active'));
+  if (p) p.classList.remove('active');
+  clearRoyalsOverlay();
+  clearRoyalHighlight();
+  updateRoyalsButtonState();
+  return wasOpen;
+}
+function openRoyalsPanel() {
+  if (!map) return;
+  if (quizState) stopQuiz(false);
+  closeDisputesUI();
+  if (mapMode !== 'world') {
+    const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
+    if (worldRadio) worldRadio.checked = true;
+    mapMode = 'world';
+    applyMapMode(true);
+  }
+  renderRoyalsList();
+  buildRoyalsOverlay();
+  const p = royalsPanelEl();
+  if (p) p.classList.add('active');
+  updateRoyalsButtonState();
+}
+function toggleRoyalsPanel() { if (royalsPanelOpen()) { closeRoyalsUI(); closeDisputeInfo(); } else openRoyalsPanel(); }
+function updateRoyalsButtonState() {
+  const btn = document.getElementById('toggle-royals');
+  if (!btn) return;
+  const open = royalsPanelOpen();
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+  btn.textContent = open ? 'Hide Monarchies & Royals' : 'Monarchies & Royals';
+}
+function renderRoyalsList() {
+  if (royalsListBuilt) return;
+  const list = document.getElementById('royals-list');
+  if (!list) return;
+  list.innerHTML = '';
+  for (const r of ROYAL_MONARCHIES) {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'dispute-row';
+    row.dataset.royalId = r.id;
+    const nm = document.createElement('span');
+    nm.className = 'dispute-row-name';
+    nm.textContent = r.name;
+    const pt = document.createElement('span');
+    pt.className = 'dispute-row-parties';
+    pt.textContent = `${r.monarch} · since ${r.since}`;
+    row.appendChild(nm);
+    row.appendChild(pt);
+    row.addEventListener('click', function() { selectRoyal(r.id); });
+    list.appendChild(row);
+  }
+  royalsListBuilt = true;
+}
+function showRoyalInfoCard(r) {
+  const t = document.getElementById('dispute-info-title');
+  if (t) t.textContent = r.name;
+  const p = document.getElementById('dispute-info-parties');
+  if (p) p.textContent = royalInfoLine(r);
+  const s = document.getElementById('dispute-info-text');
+  if (s) s.textContent = r.synopsis;
+  const infoEl = disputeInfoEl();
+  if (infoEl) { infoEl.classList.remove('quiz-docked'); infoEl.classList.add('active'); }
+  loadRoyalPortrait(r);
+}
+function showRoyalQuizInfo(r) {
+  if (!r) return;
+  showRoyalInfoCard(r);
+  const infoEl = disputeInfoEl();
+  if (infoEl) infoEl.classList.add('quiz-docked');
+}
+function boundsApproxAreaDeg(b) {
+  return Math.max(0, b.getNorth() - b.getSouth()) * Math.max(0, b.getEast() - b.getWest());
+}
+function royalFocusBounds(r, candidate) {
+  // Frame the home landmass: seed on the largest polygon part and merge only
+  // nearby parts, so far-flung territories (the Caribbean Netherlands,
+  // Svalbard) and antimeridian outliers (the Chatham Islands) can't blow the
+  // view out to the whole world. Falls back to the entry's authored circle.
+  const circle = disputeShapeBounds({ type: 'circle', c: r.c, km: r.km });
+  try {
+    if (!candidate) return circle;
+    const parts = candidatePartBounds(candidate);
+    if (!parts.length) return circle;
+    let seed = parts[0];
+    for (const p of parts) { if (boundsApproxAreaDeg(p) > boundsApproxAreaDeg(seed)) seed = p; }
+    let acc = L.latLngBounds(seed.getSouthWest(), seed.getNorthEast());
+    const used = new Set([seed]);
+    for (let pass = 0; pass < 3; pass++) {
+      let grew = false;
+      for (const p of parts) {
+        if (used.has(p)) continue;
+        if (quizBoundsGapKm(acc, p) > 250) continue;
+        const trial = L.latLngBounds(acc.getSouthWest(), acc.getNorthEast()).extend(p);
+        const cap = Math.max(70, (acc.getEast() - acc.getWest()) + 6);
+        if (trial.getEast() - trial.getWest() > cap) continue;
+        acc = trial; used.add(p); grew = true;
+      }
+      if (!grew) break;
+    }
+    if (!acc.isValid || !acc.isValid()) return circle;
+    const latKm = (acc.getNorth() - acc.getSouth()) * 111;
+    const lngKm = (acc.getEast() - acc.getWest()) * 78;
+    if (latKm < r.km * 0.5 && lngKm < r.km * 0.5) return circle;
+    return acc;
+  } catch (e) { return circle; }
+}
+function selectRoyal(id) {
+  if (!map) return;
+  const r = ROYAL_MONARCHIES.find(function(x) { return x.id === id; });
+  if (!r) return;
+  ensureRoyalPane();
+  if (royalHighlightLayer) map.removeLayer(royalHighlightLayer);
+  rebuildRoyalCandidateIndex();
+  const res = resolveRoyalCandidate(r);
+  royalHighlightLayer = res
+    ? L.geoJSON({ type: 'FeatureCollection', features: res.features }, { pane: 'royalPane', interactive: false, style: ROYAL_HIGHLIGHT_STYLE }).addTo(map)
+    : royalFallbackCircle(r, ROYAL_HIGHLIGHT_STYLE).addTo(map);
+  activeRoyalId = id;
+  const list = document.getElementById('royals-list');
+  if (list) list.querySelectorAll('.dispute-row').forEach(function(x) { x.classList.toggle('active', x.dataset.royalId === id); });
+  const focus = royalFocusBounds(r, res ? { features: res.features, layers: res.layers } : null);
+  if (focus && focus.isValid && focus.isValid()) map.flyToBounds(focus.pad(0.3), { maxZoom: royalMaxZoom(r), duration: 0.9 });
+  showRoyalInfoCard(r);
+  hideHoverLabel();
+  map.closePopup();
+  openId = null;
+}
+// ---- Royals quiz ----
+const ROYAL_PHOTOS_PER_ROUND = 2;
+let quizPhotoToken = 0;
+function hideQuizPhoto() {
+  quizPhotoToken++;
+  const ov = document.getElementById('quiz-photo-overlay');
+  if (!ov) return;
+  ov.classList.remove('active');
+  const img = document.getElementById('quiz-photo-img');
+  if (img) { img.onerror = null; img.onload = null; img.classList.remove('show'); img.removeAttribute('src'); img.alt = ''; }
+  const nm = document.getElementById('quiz-photo-name');
+  if (nm) { nm.classList.remove('show'); nm.classList.remove('caption'); nm.textContent = ''; }
+}
+function showQuizPhoto(r, keepCaption) {
+  hideQuizPhoto();
+  const ov = document.getElementById('quiz-photo-overlay');
+  if (!ov || !r) return;
+  ov.classList.add('active');
+  const nm = document.getElementById('quiz-photo-name');
+  if (nm) { nm.textContent = r.monarch; nm.classList.add('show'); }
+  const token = quizPhotoToken;
+  royalPortraitUrls(r, 700).then(function(urls) {
+    if (token !== quizPhotoToken) return;
+    const img = document.getElementById('quiz-photo-img');
+    if (!urls || !img) return;
+    img.alt = r.monarch;
+    img.onload = function() {
+      if (token !== quizPhotoToken) return;
+      img.classList.add('show');
+      if (nm && keepCaption) nm.classList.add('caption');
+      else if (nm) nm.classList.remove('show');
+    };
+    applyImgWithFallback(img, urls, null);
+  });
+}
+function royalsDeepCutsOn() {
+  const el = document.getElementById('royals-deep-cuts');
+  return !!(el && el.checked);
+}
+function royalQuizPool(includeDeepCuts) {
+  return ROYAL_MONARCHIES.filter(function(r) { return includeDeepCuts || (r.tier || 3) <= 2; });
+}
+function royalMonarchCounts(all) {
+  const counts = new Map();
+  for (const r of all) {
+    const k = norm(r.monarch);
+    counts.set(k, (counts.get(k) || 0) + 1);
+  }
+  return counts;
+}
+function royalClueOptions(r, all) {
+  // Prefer wrong answers of the same flavour (same title, same kind, or
+  // fellow realms) so visible structural facts don't give the answer away.
+  const related = [], others = [];
+  for (const o of all) {
+    if (o.id === r.id) continue;
+    const shares = o.title === r.title || o.kind === r.kind || (r.realm && o.realm);
+    (shares ? related : others).push(o.name);
+  }
+  const seen = new Set([norm(r.name)]);
+  const out = [r.name];
+  for (const v of shuffleCopy(related).concat(shuffleCopy(others))) {
+    const k = norm(v);
+    if (!k || seen.has(k)) continue;
+    seen.add(k); out.push(v);
+    if (out.length === 4) break;
+  }
+  return shuffleCopy(out);
+}
+function royalRealmOptions(r, all) {
+  const nonRealms = all.filter(function(o) { return !o.realm; }).map(function(o) { return o.name; });
+  const out = [r.name].concat(sample(nonRealms, 3));
+  return shuffleCopy(out);
+}
+function buildRoyalQuestions(subjectPool, allEligible) {
+  const pool = shuffleCopy(subjectPool);
+  const targetCount = Math.min(QUIZ_TOTAL_QUESTIONS, Math.max(1, pool.length));
+  const monarchSeen = new Set();
+  const monarchPool = [];
+  for (const r of allEligible) {
+    const k = norm(r.monarch);
+    if (monarchSeen.has(k)) continue;
+    monarchSeen.add(k); monarchPool.push(r.monarch);
+  }
+  const countryPool = allEligible.map(function(r) { return r.name; });
+  const titleSeen = new Set();
+  const titlePool = [];
+  for (const r of allEligible) {
+    const k = norm(r.title);
+    if (titleSeen.has(k)) continue;
+    titleSeen.add(k); titlePool.push(r.title);
+  }
+  const monarchCounts = royalMonarchCounts(ROYAL_MONARCHIES);
+  const indices = [];
+  for (let i = 0; i < targetCount; i++) indices.push(i);
+  const clueSlots = new Set(targetCount >= 3 ? sample(indices, Math.min(ROYAL_CLUES_PER_ROUND, targetCount)) : []);
+  const photoEligible = indices.filter(function(i) { return !clueSlots.has(i); });
+  const photoSlots = new Set(targetCount >= 5 ? sample(photoEligible, Math.min(ROYAL_PHOTOS_PER_ROUND, photoEligible.length)) : []);
+  const commonwealthOdd = ['malaysia', 'brunei', 'lesotho', 'eswatini', 'tonga'];
+  const questions = [];
+  for (let i = 0; i < targetCount; i++) {
+    const r = pool[i % pool.length];
+    const candidate = royalQuizCandidate(r);
+    if (photoSlots.has(i)) {
+      if (r.realm) {
+        // Odd-one-out: three of the pictured monarch's realms plus one
+        // Commonwealth member that keeps its own crown. The reveal then
+        // teaches that country and its own monarch.
+        const oddPool = allEligible.filter(function(o) { return !o.realm && commonwealthOdd.indexOf(o.id) !== -1; });
+        const anyNonRealm = allEligible.filter(function(o) { return !o.realm; });
+        const odd = sample(oddPool.length ? oddPool : anyNonRealm, 1)[0];
+        const realmNames = sample(allEligible.filter(function(o) { return o.realm; }).map(function(o) { return o.name; }), 3);
+        questions.push({
+          type: 'royal-photo-not', candidate: royalQuizCandidate(odd), photoRoyal: r,
+          prompt: 'This monarch is head of state of three of these countries — which one is NOT?',
+          instruction: 'Study the portrait on the map, then choose — tap an answer or press 1–4.',
+          options: shuffleCopy([odd.name].concat(realmNames)),
+          answer: odd.name
+        });
+      } else {
+        questions.push({
+          type: 'royal-photo-country', candidate, photoRoyal: r,
+          prompt: 'This monarch is the head of state of which country?',
+          instruction: 'Study the portrait on the map, then choose — tap an answer or press 1–4.',
+          options: optionSet(r.name, countryPool),
+          answer: r.name
+        });
+      }
+      continue;
+    }
+    if (clueSlots.has(i)) {
+      questions.push({
+        type: 'royal-clue', candidate,
+        prompt: 'Mystery monarchy — identify the country from its story',
+        instruction: '“' + royalMaskedSynopsis(r) + '” — choose the answer below, tap it or press 1–4.',
+        options: royalClueOptions(r, allEligible),
+        answer: r.name
+      });
+      continue;
+    }
+    const roll = Math.random();
+    if (r.realm && roll < 0.5) {
+      questions.push({
+        type: 'royal-realm', candidate,
+        prompt: 'Which of these is a Commonwealth realm — with King Charles III as its head of state?',
+        instruction: 'Choose the correct answer — tap it or press 1–4.',
+        options: royalRealmOptions(r, allEligible),
+        answer: r.name
+      });
+    } else if (!r.realm && roll >= 0.4 && roll < 0.75 && monarchCounts.get(norm(r.monarch)) === 1) {
+      questions.push({
+        type: 'royal-country', candidate,
+        prompt: `${r.monarch} is the head of state of which country?`,
+        instruction: 'Choose the correct answer — tap it or press 1–4.',
+        options: optionSet(r.name, countryPool),
+        answer: r.name
+      });
+    } else if (!r.realm && roll >= 0.75) {
+      questions.push({
+        type: 'royal-title', candidate,
+        prompt: `Which title does the head of state of ${r.name} hold?`,
+        instruction: 'The country is highlighted on the map. Choose the correct answer — tap it or press 1–4.',
+        options: optionSet(r.title, titlePool),
+        answer: r.title
+      });
+    } else {
+      questions.push({
+        type: 'royal-monarch', candidate,
+        prompt: `Who is the head of state of ${r.name}?`,
+        instruction: 'The country is highlighted on the map. Choose the correct answer — tap it or press 1–4.',
+        options: optionSet(r.monarch, monarchPool),
+        answer: r.monarch
+      });
+    }
+  }
+  return questions;
+}
+function startRoyalsQuiz() { beginRoyalsQuiz(null); }
+function beginRoyalsQuiz(royalSubset) {
+  if (!map) return;
+  hideHoverLabel(); map.closePopup(); openId = null;
+  closeDisputesUI();
+  closeRoyalsUI();
+  closeDisputeInfo();
+  if (mapMode !== 'world') {
+    const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
+    if (worldRadio) worldRadio.checked = true;
+    mapMode = 'world';
+    applyMapMode(true);
+  }
+  rebuildRoyalCandidateIndex();
+  const allEligible = ROYAL_MONARCHIES;
+  const pool = (royalSubset && royalSubset.length) ? royalSubset : royalQuizPool(royalsDeepCutsOn());
+  if (allEligible.length < 4 || !pool.length) return;
+  quizState = { mode: mapMode, kind: 'royals', questions: buildRoyalQuestions(pool, allEligible), index: 0, score: 0, locked: false, awaitingMapClick: false };
+  renderQuizQuestion();
 }
 function currentLabelMode() {
   const selected = document.querySelector('input[name="label-mode"]:checked');
@@ -3989,6 +4868,8 @@ function clearQuizHighlight() {
   if (quizHighlightLayer) quizHighlightLayer.clearLayers();
 }
 function candidateBounds(candidate) {
+  if (candidate && candidate.dispute) return disputeBounds(candidate.dispute);
+  if (candidate && candidate.royal && !(candidate.layers || []).length) return disputeShapeBounds({ type: 'circle', c: candidate.royal.c, km: candidate.royal.km });
   let bounds = null;
   for (const layer of candidate.layers || []) {
     let b = null;
@@ -4111,6 +4992,10 @@ function besideOrNearestClueForCandidate(candidate) {
   }
 }
 function zoomToCandidate(candidate) {
+  if (candidate && candidate.royal) {
+    const rb = royalFocusBounds(candidate.royal, candidate);
+    if (rb && rb.isValid && rb.isValid()) { map.flyToBounds(rb, { animate: true, duration: 0.75, padding: [70, 70], maxZoom: royalMaxZoom(candidate.royal) }); return; }
+  }
   const b = candidateBounds(candidate);
   if (!b) return;
   const maxZoom = mapMode === 'world' ? 7 : (mapMode === 'us-states' ? 7 : 9);
@@ -4176,6 +5061,21 @@ function zoomToCurrentQuizExtent() {
 function highlightQuizCandidate(candidate) {
   clearQuizHighlight();
   if (!candidate || !quizHighlightLayer) return;
+  if (candidate.dispute) {
+    const style = { pane: 'quizPane', interactive: false, color: '#b45309', weight: 2.5, opacity: 0.95, dashArray: '6 5', fillColor: '#f59e0b', fillOpacity: 0.14 };
+    for (const s of candidate.dispute.shapes || []) {
+      let layer = null;
+      if (s.type === 'circle') layer = L.circle(s.c, Object.assign({ radius: s.km * 1000 }, style));
+      else if (s.type === 'box') layer = L.rectangle(s.b, style);
+      else layer = L.polygon(s.coords, style);
+      layer.addTo(quizHighlightLayer);
+    }
+    return;
+  }
+  if (candidate.royal && !(candidate.features || []).length) {
+    royalFallbackCircle(candidate.royal, { pane: 'quizPane', interactive: false, color: '#8a6d1a', weight: 2.5, opacity: 1, dashArray: '6 4', fillColor: '#d4a017', fillOpacity: 0.30 }).addTo(quizHighlightLayer);
+    return;
+  }
   const features = (candidate.features || []).filter(f => f && f.geometry);
   if (!features.length) return;
   L.geoJSON({ type: 'FeatureCollection', features }, {
@@ -4215,6 +5115,14 @@ function answerQuizChoice(value, btn) {
   });
   if (correct) { quizState.score++; quizSetFeedback('Correct!', 'good'); flashQuizPanel('quiz-correct-flash'); }
   else { quizSetFeedback(`Incorrect — the answer was ${q.answer}.`, 'bad'); flashQuizPanel('quiz-wrong-flash'); highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
+  if (q.candidate && q.candidate.dispute) {
+    if (correct && q.type === 'dispute-clue') { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
+    showDisputeQuizInfo(q.candidate.dispute);
+  }
+  if (q.candidate && q.candidate.royal) {
+    if (correct && (q.type === 'royal-clue' || q.type === 'royal-country' || q.type === 'royal-realm' || q.type === 'royal-photo-country' || q.type === 'royal-photo-not')) { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
+    showRoyalQuizInfo(q.candidate.royal);
+  }
   renderNextQuizAction();
 }
 function flashQuizPanel(cls) {
@@ -4239,8 +5147,13 @@ function renderQuizQuestion() {
   quizState.locked = false;
   quizState.awaitingMapClick = q.type === 'find';
   q.attemptsLeft = 2;
+  const isPanelQuiz = quizState.kind === 'disputes' || quizState.kind === 'royals';
+  if (isPanelQuiz) closeDisputeInfo();
+  hideQuizPhoto();
+  const quizTitleEl = document.querySelector('#quiz-game-panel .quiz-game-title');
+  if (quizTitleEl) quizTitleEl.textContent = quizState.kind === 'disputes' ? 'Disputes quiz' : (quizState.kind === 'royals' ? 'Royals quiz' : 'Map quiz');
   const panel = quizPanelEl();
-  if (panel) panel.classList.add('active');
+  if (panel) { panel.classList.add('active'); panel.classList.toggle('disputes-quiz', isPanelQuiz); }
   const prog = document.getElementById('quiz-progress');
   if (prog) prog.textContent = `Question ${quizState.index + 1} / ${quizState.questions.length} · Score ${quizState.score}`;
   const questionEl = document.getElementById('quiz-question');
@@ -4271,11 +5184,17 @@ function renderQuizQuestion() {
       renderNextQuizAction();
     }, false);
     addQuizAction('End quiz', function() { stopQuiz(false); }, false);
+  } else if (q.type === 'dispute-clue' || q.type === 'royal-clue' || q.type === 'royal-country' || q.type === 'royal-realm' || q.type === 'royal-photo-country' || q.type === 'royal-photo-not') {
+    clearQuizHighlight();
+    zoomToCurrentQuizExtent();
+    if (q.photoRoyal) showQuizPhoto(q.photoRoyal, true);
+    renderQuizOptions(q, false);
+    addQuizAction('End quiz', function() { stopQuiz(false); }, false);
   } else {
     highlightQuizCandidate(q.candidate);
     zoomToCandidate(q.candidate);
     renderQuizOptions(q, false);
-    if (q.type === 'identify') {
+    if (q.type === 'identify' || q.type === 'dispute-name' || q.type === 'dispute-parties' || q.type === 'royal-monarch' || q.type === 'royal-title') {
       addQuizAction('Reposition the view...', function() {
         if (!quizState || quizState.locked) return;
         highlightQuizCandidate(q.candidate);
@@ -4325,23 +5244,50 @@ function renderQuizReview(missed) {
       sub.className = 'quiz-review-sub';
       sub.textContent = `Capital: ${q.candidate.capital}`;
       btn.appendChild(sub);
+    } else if (q.candidate.dispute) {
+      const sub = document.createElement('span');
+      sub.className = 'quiz-review-sub';
+      sub.textContent = q.candidate.dispute.parties;
+      btn.appendChild(sub);
+    } else if (q.candidate.royal) {
+      const sub = document.createElement('span');
+      sub.className = 'quiz-review-sub';
+      sub.textContent = q.candidate.royal.monarch;
+      btn.appendChild(sub);
     }
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       highlightQuizCandidate(q.candidate);
       zoomToCandidate(q.candidate);
+      if (q.candidate.dispute) showDisputeQuizInfo(q.candidate.dispute);
+      if (q.candidate.royal) showRoyalQuizInfo(q.candidate.royal);
     });
     host.appendChild(btn);
   }
 }
 function retryMissedQuizQuestions() {
+  const quizKind = quizState && quizState.kind;
   const missed = quizMissedQuestions().map(q => q.candidate);
+  if (quizKind === 'disputes') {
+    const missedDisputes = missed.map(function(c) { return c && c.dispute; }).filter(Boolean);
+    if (!missedDisputes.length) { startDisputesQuiz(); return; }
+    beginDisputesQuiz(missedDisputes);
+    return;
+  }
+  if (quizKind === 'royals') {
+    const missedRoyals = missed.map(function(c) { return c && c.royal; }).filter(Boolean);
+    if (!missedRoyals.length) { startRoyalsQuiz(); return; }
+    beginRoyalsQuiz(missedRoyals);
+    return;
+  }
   if (!missed.length) { startQuiz(); return; }
   beginQuiz(missed);
 }
 function finishQuiz() {
   if (!quizState) return;
   clearQuizHighlight();
+  if (quizState.kind === 'disputes' || quizState.kind === 'royals') closeDisputeInfo();
+  hideQuizPhoto();
   quizState.awaitingMapClick = false;
   const panel = quizPanelEl();
   if (panel) panel.classList.add('active');
@@ -4351,19 +5297,25 @@ function finishQuiz() {
   if (questionEl) questionEl.textContent = `Result: ${quizState.score} / ${quizState.questions.length}`;
   const missed = quizMissedQuestions();
   const instructionEl = document.getElementById('quiz-instruction');
-  if (instructionEl) instructionEl.textContent = `${QUIZ_MODE_TITLES[mapMode] || 'Current map'} quiz complete.` + (missed.length ? ' Tap a missed answer below to see it on the map.' : ' Full marks!');
+  const quizKindTitle = quizState.kind === 'disputes' ? 'Territorial disputes' : (quizState.kind === 'royals' ? 'Monarchies & Royals' : (QUIZ_MODE_TITLES[mapMode] || 'Current map'));
+  if (instructionEl) instructionEl.textContent = `${quizKindTitle} quiz complete.` + (missed.length ? ' Tap a missed answer below to see it on the map.' : ' Full marks!');
   clearQuizOptions(); quizSetFeedback(''); clearQuizActions();
   renderQuizReview(missed);
   if (missed.length) addQuizAction(missed.length === 1 ? 'Retry the one you missed' : `Retry the ${missed.length} you missed`, retryMissedQuizQuestions, true);
-  addQuizAction('Play again', startQuiz, missed.length === 0);
+  addQuizAction('Play again', quizState.kind === 'disputes' ? startDisputesQuiz : (quizState.kind === 'royals' ? startRoyalsQuiz : startQuiz), missed.length === 0);
   addQuizAction('Back to map', function() { stopQuiz(false); });
 }
 function stopQuiz(silent=true) {
+  const wasPanelQuiz = !!(quizState && (quizState.kind === 'disputes' || quizState.kind === 'royals'));
   quizState = null;
   if (quizCluePanTimer) { window.clearTimeout(quizCluePanTimer); quizCluePanTimer = null; }
   clearQuizHighlight(); hideHoverLabel();
+  if (wasPanelQuiz) closeDisputeInfo();
+  hideQuizPhoto();
   const panel = quizPanelEl();
-  if (panel) panel.classList.remove('active');
+  if (panel) { panel.classList.remove('active'); panel.classList.remove('disputes-quiz'); }
+  const quizTitleEl = document.querySelector('#quiz-game-panel .quiz-game-title');
+  if (quizTitleEl) quizTitleEl.textContent = 'Map quiz';
   clearQuizOptions(); clearQuizActions(); quizSetFeedback('');
   if (!silent) zoomToCurrentQuizExtent();
 }
@@ -4371,6 +5323,7 @@ function startQuiz() { beginQuiz(null); }
 function beginQuiz(candidateSubset) {
   hideHoverLabel(); map.closePopup(); openId = null;
   closeDisputesUI();
+  closeRoyalsUI();
   const candidates = getVisibleQuizCandidates();
   if (candidates.length < 4) {
     const panel = quizPanelEl();
@@ -4626,7 +5579,7 @@ function createControlPanel() {
     input.addEventListener('change', function() {
       if (!this.checked) return;
       stopQuiz(true);
-      if (this.value !== 'world') closeDisputesUI();
+      if (this.value !== 'world') { closeDisputesUI(); closeRoyalsUI(); }
       mapMode = this.value;
       applyMapMode(true);
     });
@@ -4644,6 +5597,14 @@ function createControlPanel() {
   if (disputesBtn) disputesBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); toggleDisputesPanel(); });
   const disputesCloseBtn = document.getElementById('disputes-close');
   if (disputesCloseBtn) disputesCloseBtn.addEventListener('click', function() { closeDisputesUI(); });
+  const royalsBtn = document.getElementById('toggle-royals');
+  if (royalsBtn) royalsBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); toggleRoyalsPanel(); });
+  const royalsCloseBtn = document.getElementById('royals-close');
+  if (royalsCloseBtn) royalsCloseBtn.addEventListener('click', function() { closeRoyalsUI(); closeDisputeInfo(); });
+  const startRoyalsQuizBtn2 = document.getElementById('start-royals-quiz');
+  if (startRoyalsQuizBtn2) startRoyalsQuizBtn2.addEventListener('click', function(e) { L.DomEvent.stop(e); startRoyalsQuiz(); });
+  const royalsPanelDiv = document.getElementById('royals-panel');
+  if (royalsPanelDiv) { L.DomEvent.disableClickPropagation(royalsPanelDiv); L.DomEvent.disableScrollPropagation(royalsPanelDiv); }
   const disputeInfoCloseBtn = document.getElementById('dispute-info-close');
   if (disputeInfoCloseBtn) disputeInfoCloseBtn.addEventListener('click', function() { closeDisputeInfo(); });
   const disputesPanelDiv = document.getElementById('disputes-panel');
@@ -4652,6 +5613,8 @@ function createControlPanel() {
   if (disputeInfoDiv) { L.DomEvent.disableClickPropagation(disputeInfoDiv); L.DomEvent.disableScrollPropagation(disputeInfoDiv); }
   const startQuizBtn = document.getElementById('start-quiz');
   if (startQuizBtn) startQuizBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); startQuiz(); });
+  const startDisputesQuizBtn = document.getElementById('start-disputes-quiz');
+  if (startDisputesQuizBtn) startDisputesQuizBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); startDisputesQuiz(); });
   const quizPanel = document.getElementById('quiz-game-panel');
   if (quizPanel) { L.DomEvent.disableClickPropagation(quizPanel); L.DomEvent.disableScrollPropagation(quizPanel); }
 }
@@ -5559,7 +6522,7 @@ async function startQuizMap() {
 (function setupQuizKeyboardShortcuts() {
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      if (closeDisputeInfo() || closeDisputesUI()) { e.preventDefault(); }
+      if (closeDisputeInfo() || closeRoyalsUI() || closeDisputesUI()) { e.preventDefault(); }
       return;
     }
     if (!quizState) return;

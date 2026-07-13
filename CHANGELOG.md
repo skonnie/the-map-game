@@ -1,5 +1,60 @@
 # Changelog
 
+## v85 — Quiz card docking, naming polish, and data audit
+
+- Royals and disputes quiz answer cards now dock to the bottom-right, clear of the quiz panel and the portrait; browse-mode card positioning is unchanged.
+- Photo questions always display the pictured monarch's name (the name only) beneath the portrait.
+- "Monarchies & Royals" is now capitalised consistently across the toggle button, panel title and quiz-complete screen.
+- Data audit (verified 13 July 2026): full roster of 43 confirmed, including Jamaica's continuing realm status and Emir Mishal of Kuwait; Qatar entry unaffected by the death of Father Emir Sheikh Hamad (12 July 2026). Three corrections: Sālote was Tupou VI's grandmother (not great-grandmother), Morocco's Alaouite dating softened to the seventeenth century, and Kuwait's parliamentary role stated precisely (approval of each crown prince).
+
+## v84 — Portrait reliability and layout fixes
+
+- Monarch photos now load through a fallback chain: the high-resolution request falls back automatically to Wikipedia's guaranteed-served thumbnail, and hides only if both fail — restoring portraits everywhere and making them immune to future sizing changes.
+- While a quiz portrait is on screen, the info card docks to the bottom-left instead of colliding with it mid-screen (the card remains draggable).
+- Odd-one-out photo questions show the portrait with the monarch's name as a caption beneath it, as designed — previously only the name appeared because the photo request itself was failing.
+- Image error/load handlers are cleaned up when photos hide, and lazy-loading was removed from the card portrait.
+
+## v83 — Face the monarch
+
+- New photo questions in the royals quiz: two per round, showing a large portrait (350px, fetched live from Wikipedia) centred over the map in a gold frame.
+- Single-country monarchs ask "This monarch is the head of state of which country?" — pure face recognition.
+- Shared monarchs (King Charles III's realms) invert the question: "head of state of three of these countries — which one is NOT?", with three realms plus one Commonwealth member that keeps its own crown (Malaysia, Brunei, Lesotho, Eswatini or Tonga). The reveal highlights the odd one out and shows its own monarch's card.
+- The pictured monarch's name appears while the photo loads (and stays as a caption on odd-one-out questions); if no image is available the name card stands in, so the question always works.
+- Portrait plumbing now serves any display size from one cached Wikipedia lookup per monarch.
+
+## v82 — Portrait polish
+
+- Monarch portraits are 50% larger (112px) and stay circular, with the crop window anchored near the top of the image so heads are no longer clipped by the round frame.
+- Portraits now request a sharper Wikipedia thumbnail sized for high-DPI screens, capped at each image's original width.
+
+## v81 — Royals zoom fix and monarch portraits
+
+- Fixed royals browse and quiz zooming for countries with far-flung territories or antimeridian parts: Netherlands (Caribbean municipalities), Norway (Svalbard and Jan Mayen), New Zealand (Chatham Islands) and similar no longer fly out to a world view. The camera now frames the home landmass, merging only nearby parts, with the authored circle as a fallback.
+- Added monarch portraits to the info card, top-centre: the current lead image from each monarch's Wikipedia article is fetched live (29 unique articles across the 43 states), cached per session, and hidden gracefully if unavailable. Dispute cards are unaffected.
+
+## v80 — Monarchies & royals
+
+- New "Monarchies & royals" browse panel: all 43 sovereign states with a royal head of state, with a gold overlay on the world map, per-country highlight and fly-to, and an info card showing monarch, house and accession year (details verified July 2026).
+- New royals quiz with five leak-proofed question styles: name the monarch of a highlighted country, reverse monarch-to-country, title questions (Emir, Grand Duke, Yang di-Pertuan Agong...), Commonwealth-realm spotting, and redacted "mystery monarchy" clues.
+- Realm-aware question logic: King Charles III's fifteen realms never appear in ambiguous reverse questions and get dedicated realm-identification questions instead.
+- Country polygons resolve from the world layer at runtime via alias lists (the UK merges its four home nations); unresolved entries fall back to a circle so every monarchy still works.
+- The clue redaction engine is now shared between disputes and royals, masking country, monarch, house and demonym tokens with the same collapse-and-absorb rules; the disputes quiz behaviour is unchanged.
+- Difficulty tiers with an "Include deep cuts" toggle, and full integration with scoring, review, retry and keyboard shortcuts.
+
+## v79 — Disputes quiz leak-proofing
+
+- Parties questions no longer state the dispute name, which sometimes contained the answer (e.g. Israeli–Palestinian territories); they now ask about the highlighted region instead.
+- Clue redactions collapse multi-word names into a single blank, so word count no longer telegraphs answers like the South China Sea.
+- Redactions absorb adjacent giveaway words (Sea, Heights, Plateau, North/South, "Las"...) and verbatim name phrases made of generic words (e.g. the Kurils' "Northern Territories").
+
+## v78 — Disputes quiz
+
+- Added a 10-question multiple-choice quiz to the territorial disputes panel.
+- Three question styles: name the highlighted region, pick the parties involved, and identify a "mystery region" from its redacted synopsis (two per round).
+- Added difficulty tiers to the interstate disputes, with a headline/regional default pool and an optional "Include deep cuts" toggle.
+- Every answer reveals the dispute's synopsis card, and missed questions feed the existing review/retry flow.
+- Internal identity and autonomy entries remain browse-only, and quiz prompts stay framing-neutral (no "who does it belong to" questions).
+
 ## v77 — Offshore island recognition
 
 - Added recognition overlays for major offshore island regions.

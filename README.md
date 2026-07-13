@@ -29,6 +29,8 @@ No GitHub Actions workflow or build process is needed.
 - 10-question quiz mode.
 - Country information widget using local UN WPP population data where available.
 - Territorial and identity disputes layer.
+- Disputes quiz: 10 multiple-choice questions on territorial disputes, including redacted "mystery region" clues and an optional deep-cuts difficulty toggle.
+- Monarchies & royals: browse all 43 royal-headed states on a gold-tinted map, then take a quiz on monarchs, titles, Commonwealth realms and redacted royal stories.
 - Recognition overlays for major offshore island regions such as the Canary Islands, Balearic Islands, Corsica, Sardinia, Sicily, Madeira, Azores, Crete, Åland, Gotland and Bornholm.
 
 ## Important upload warning
