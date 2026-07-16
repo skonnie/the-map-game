@@ -640,8 +640,6 @@
   @media (prefers-reduced-motion: reduce) { .country-hl-dash { animation: none; } }
   .popup-flag { display: block; height: 45px; width: auto; border: 1px solid rgba(0,0,0,.25); border-radius: 3px; margin: 0 0 6px; }
   .zoomout-ctl a { font-size: 15px; line-height: 30px; text-align: center; }
-  .zoomout-ctl { margin-left: 40px !important; margin-top: -38px !important; }
-  .leaflet-touch .zoomout-ctl { margin-left: 44px !important; margin-top: -42px !important; }
   #quiz-photo-overlay { display: none; position: absolute; z-index: 945; left: 50%; top: 96px; transform: translateX(-50%); width: min(350px, calc(100vw - 24px)); pointer-events: none; background: rgba(255,255,255,.97); border: 3px solid #caa64a; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.30); padding: 6px; box-sizing: border-box; }
   #quiz-photo-overlay.active { display: block; }
   #quiz-photo-img { display: none; width: 100%; height: auto; max-height: 46vh; object-fit: cover; object-position: 50% 12%; border-radius: 9px; }
@@ -6618,6 +6616,14 @@ async function startQuizMap() {
     L.DomEvent.on(a, 'click', function(e) { L.DomEvent.stop(e); zoomToCurrentQuizExtent(); });
     L.DomEvent.disableClickPropagation(div);
     L.DomEvent.disableScrollPropagation(div);
+    requestAnimationFrame(function() {
+      const zb = map && map._container ? map._container.querySelector('.leaflet-control-zoom') : null;
+      if (!zb || !div.offsetHeight) return;
+      div.style.position = 'absolute';
+      div.style.margin = '0';
+      div.style.left = (zb.offsetLeft + zb.offsetWidth + 8) + 'px';
+      div.style.top = (zb.offsetTop + zb.offsetHeight - div.offsetHeight) + 'px';
+    });
     return div;
   };
   zoomOutCtl.addTo(map);
