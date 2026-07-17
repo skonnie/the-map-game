@@ -1,5 +1,11 @@
 # Changelog
 
+## v101 — Whole-portrait framing for the British Monarchy
+
+- British Monarchy card portraits are ~50-70% larger and completely uncropped: full-length paintings display whole in a rounded frame at their natural aspect, so heads, crowns and regalia are always entirely visible.
+- Quiz portrait-identification images likewise show the whole painting rather than a cropped window.
+- Modern Monarchies & Royals portraits keep their circular frame, and country flags are unaffected.
+
 ## v100 — The British Monarchy
 
 - New "British Monarchy" browser under Explore: the continuous royal line from Æthelstan (927) to Charles III — 57 chronological entries across ten houses, with house dividers, reign dates, disputed reigns (Lady Jane Grey) and the Interregnum marked.

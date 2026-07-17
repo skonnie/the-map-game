@@ -635,6 +635,8 @@
   #dispute-info-photo { display: none; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; margin: 6px auto 9px; border: 3px solid #caa64a; box-shadow: 0 3px 12px rgba(0,0,0,.22); background: #f3ead2; }
   #dispute-info-photo.show { display: block; }
   #dispute-info-photo.photo-rect { border-radius: 8px; width: 150px; height: auto; max-height: 150px; object-fit: contain; object-position: 50% 50%; background: transparent; }
+  #dispute-info-photo.photo-tall { border-radius: 10px; width: auto; height: auto; max-width: 172px; max-height: 195px; object-fit: contain; object-position: 50% 50%; }
+  #quiz-photo-img.photo-contain { object-fit: contain; object-position: 50% 50%; max-height: 52vh; background: #f8f5ec; }
   .country-hl-dash { animation: countryDashMarch 2.2s linear infinite; }
   @keyframes countryDashMarch { to { stroke-dashoffset: -30; } }
   @media (prefers-reduced-motion: reduce) { .country-hl-dash { animation: none; } }
@@ -4540,7 +4542,7 @@ function showBritInfoCard(e) {
   if (s) s.textContent = e.synopsis;
   const infoEl = disputeInfoEl();
   if (infoEl) { infoEl.classList.remove('quiz-docked'); infoEl.classList.add('active'); }
-  loadRoyalPortrait({ id: 'brit-' + e.id, wiki: e.wiki, monarch: e.name });
+  loadRoyalPortrait({ id: 'brit-' + e.id, wiki: e.wiki, monarch: e.name }, 'photo-tall');
 }
 function showBritQuizInfo(e) {
   if (!e) return;
@@ -4898,7 +4900,7 @@ function setInfoCardPhoto(url, alt) {
   const img = document.getElementById('dispute-info-photo');
   if (!img) return;
   if (url) { img.alt = alt || ''; img.src = url; img.classList.add('show'); }
-  else { img.onerror = null; img.onload = null; img.classList.remove('show'); img.classList.remove('photo-rect'); img.removeAttribute('src'); img.alt = ''; }
+  else { img.onerror = null; img.onload = null; img.classList.remove('show'); img.classList.remove('photo-rect'); img.classList.remove('photo-tall'); img.removeAttribute('src'); img.alt = ''; }
 }
 function hideInfoCardPhoto() {
   royalPortraitToken++;
@@ -4944,7 +4946,7 @@ function applyImgWithFallback(img, urls, onFail) {
   };
   img.src = urls.sized || urls.base;
 }
-function loadRoyalPortrait(r) {
+function loadRoyalPortrait(r, frame) {
   hideInfoCardPhoto();
   const token = royalPortraitToken;
   royalPortraitUrls(r, 360).then(function(urls) {
@@ -4952,6 +4954,8 @@ function loadRoyalPortrait(r) {
     const img = document.getElementById('dispute-info-photo');
     if (!img) return;
     img.classList.remove('photo-rect');
+    img.classList.remove('photo-tall');
+    if (frame) img.classList.add(frame);
     img.alt = r.monarch;
     img.classList.add('show');
     applyImgWithFallback(img, urls, function() {
@@ -5175,7 +5179,7 @@ function hideQuizPhoto() {
   if (!ov) return;
   ov.classList.remove('active');
   const img = document.getElementById('quiz-photo-img');
-  if (img) { img.onerror = null; img.onload = null; img.classList.remove('show'); img.removeAttribute('src'); img.alt = ''; }
+  if (img) { img.onerror = null; img.onload = null; img.classList.remove('show'); img.classList.remove('photo-contain'); img.removeAttribute('src'); img.alt = ''; }
   const nm = document.getElementById('quiz-photo-name');
   if (nm) { nm.classList.remove('show'); nm.classList.remove('caption'); nm.textContent = ''; }
 }
@@ -5192,6 +5196,7 @@ function showQuizPhoto(r, keepCaption, placeholderText) {
     const img = document.getElementById('quiz-photo-img');
     if (!urls || !img) return;
     img.alt = placeholderText || r.monarch;
+    img.classList.toggle('photo-contain', !!placeholderText);
     img.onload = function() {
       if (token !== quizPhotoToken) return;
       img.classList.add('show');
