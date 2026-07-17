@@ -1,5 +1,31 @@
 # Changelog
 
+## v100 — The British Monarchy
+
+- New "British Monarchy" browser under Explore: the continuous royal line from Æthelstan (927) to Charles III — 57 chronological entries across ten houses, with house dividers, reign dates, disputed reigns (Lady Jane Grey) and the Interregnum marked.
+- Opening it veils the world outside Britain and Ireland with a coastline-accurate spotlight mask and frames the isles for the whole game.
+- Each reign drives the map: the monarch's actual realm is highlighted (Ireland joins under Henry II, Wales under Edward I, Scotland at the Union of the Crowns, the Republic departs after partition) and key sites — Eamont, Hastings, Runnymede, Bannockburn, Bosworth, Tilbury, the Boyne, Culloden — are marked with labelled rings where history offers one.
+- The info card shows each monarch's portrait (live from Wikipedia — paintings for the pre-photography reigns), house, reign and a synopsis.
+- Quiz with four leak-proofed question styles: who came to the throne first, which house, redacted mystery-reign clues, and portrait identification (the portrait card asks "Who is this?" rather than captioning its own answer). Deep-cuts toggle unlocks the Wessex and Danish obscurities; full review, retry, keyboard and auto-collapse integration.
+- Shared masking engine upgraded to handle Æ and accented names safely; disputes and royals regression-tested through it.
+
+## v99 — Cinematic travel reverted
+
+- Removed the distance-scaled flight durations from v98; all map transitions are back to their original quick timings.
+
+## v98 — Cinematic map travel
+
+- Every automated flight across the map now scales its duration with the distance covered: short hops stay quick (~1.5s), continental moves take ~3-4s, and hemisphere-crossing jumps glide for up to ~6.5s, giving the map time to render mid-flight and the transition room to breathe.
+- Applied at the engine level, so it permeates every feature — disputes, royals, country list, quiz reveals and repositions, and the zoom-out control — without touching individual call sites. Respects the reduced-motion preference.
+
+## v97 — Zoom-out button pixel-aligned
+
+- The zoom-out globe now measures the real zoom control at runtime and pins itself beside the − button with their bottoms exactly aligned, on any device or theme.
+
+## v96 — Zoom-out button repositioned
+
+- The full zoom-out globe now sits directly beside the − button instead of below the zoom control, clearing the Monarchies & Royals panel and the other left-side widgets.
+
 ## v95 — Bigger popup flags
 
 - World-map popup flags are three times larger (45px tall) and sit above the country name, served from a sharper source image.
