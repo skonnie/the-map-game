@@ -1,5 +1,9 @@
 # Changelog
 
+## v102 — Brighter key-site rings
+
+- British Monarchy key-site markers are now a bright off-yellow dashed ring over a soft dark halo, clearly visible against both the highlighted realm and the base map while staying understated.
+
 ## v101 — Whole-portrait framing for the British Monarchy
 
 - British Monarchy card portraits are ~50-70% larger and completely uncropped: full-length paintings display whole in a rounded frame at their natural aspect, so heads, crowns and regalia are always entirely visible.

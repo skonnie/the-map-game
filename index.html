@@ -4438,10 +4438,15 @@ function britHighlightLayersFor(e, pane) {
     layers.push(L.geoJSON(fc, { pane: pane, interactive: false, style: Object.assign({}, COUNTRY_HIGHLIGHT_STYLE, { pane: pane }) }));
   }
   if (e.spot && e.spot.c) {
+    const spotRadius = (e.spot.km || 9) * 1000;
+    layers.push(L.circle(e.spot.c, {
+      pane: pane, interactive: false, radius: spotRadius,
+      color: '#7c2d12', weight: 5.5, opacity: 0.35, dashArray: '6 5', fill: false
+    }));
     const spot = L.circle(e.spot.c, {
-      pane: pane, interactive: false, radius: (e.spot.km || 9) * 1000,
-      color: '#b45309', weight: 2.5, opacity: 0.95, dashArray: '6 5',
-      fillColor: '#f59e0b', fillOpacity: 0.25
+      pane: pane, interactive: false, radius: spotRadius,
+      color: '#ffe066', weight: 3, opacity: 1, dashArray: '6 5',
+      fillColor: '#ffec99', fillOpacity: 0.28
     });
     if (e.spot.label) spot.bindTooltip(e.spot.label, { permanent: true, direction: 'top', className: 'brit-spot-label', offset: [0, -6] });
     layers.push(spot);
