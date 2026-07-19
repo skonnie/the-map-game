@@ -1,5 +1,21 @@
 # Changelog
 
+## v105 — Quiz flags fixed and docked
+
+- Fixed: quiz flag images never appeared — the shared image loader expects a sized/base URL pair and was being handed a plain list, so the overlay image never received a valid source. Flags now load at w640 with a w320 fallback.
+- Find-the-country questions now dock their mystery flag inside the quiz panel instead of floating it over the map, so the whole map stays visible while you hunt, on desktop and mobile alike. The floating overlay remains for identification questions and answer reveals — and reveals after find questions deliberately skip it, keeping the just-revealed country in view.
+
+## v104 — Countries first in Explore
+
+- The Explore section of the control panel now leads with Full List of Countries, followed by Territorial & Identity Disputes, Monarchies & Royals, British Monarchy and Flags.
+
+## v103 — Flags
+
+- New "Flags" browser under Explore: every sovereign state's flag in a tappable A–Z grid (England, Scotland and Wales fly their own); tapping a flag flies to the country and opens its info card.
+- Flags quiz in the house style — ten questions mixing colour posers ("Which of these colours is NOT in the flag of…?" with tappable colour chips, the flag revealed alongside the answer), pick-the-correct-flag from four flag images, find-the-country-of-this-flag on the map, and straight identification — with deep cuts, flag-thumbnail review, retry-missed and keyboard support throughout.
+- The world map quiz now deals flags as a fourth question type alongside identify, find and capital.
+- Colour questions draw from a curated set of 170 flags with clean palettes so every answer is defensible; Northern Ireland (no official flag since 1973) and Afghanistan (flag contested) sit outside the flag pools.
+
 ## v102 — Brighter key-site rings
 
 - British Monarchy key-site markers are now a bright off-yellow dashed ring over a soft dark halo, clearly visible against both the highlighted realm and the base map while staying understated.

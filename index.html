@@ -587,7 +587,7 @@
 
   /* Territorial disputes */
   .disputes-toggle-btn.active { background: #7c2d12; color: white; border-color: #7c2d12; }
-  #disputes-panel, #royals-panel, #countries-panel, #brit-panel {
+  #disputes-panel, #royals-panel, #countries-panel, #brit-panel, #flags-panel {
     display: none; position: absolute; z-index: 975; left: 14px; top: 92px;
     width: min(240px, calc(100vw - 28px));
     box-sizing: border-box;
@@ -595,7 +595,7 @@
     box-shadow: 0 10px 28px rgba(0,0,0,.25); padding: 9px 10px;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
-  #disputes-panel.active, #royals-panel.active, #countries-panel.active, #brit-panel.active { display: block; }
+  #disputes-panel.active, #royals-panel.active, #countries-panel.active, #brit-panel.active, #flags-panel.active { display: block; }
   .disputes-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
   .disputes-title { font-weight: 900; font-size: 13px; }
   .disputes-x { border: none; background: transparent; color: #52617a; font-size: 17px; line-height: 1; font-weight: 800; cursor: pointer; padding: 2px 6px; border-radius: 7px; }
@@ -652,6 +652,21 @@
   #quiz-photo-name { display: none; text-align: center; font-weight: 900; font-size: 17px; padding: 16px 8px; color: #172033; }
   #quiz-photo-name.show { display: block; }
   #quiz-photo-name.caption { font-size: 12.5px; padding: 5px 6px 2px; color: #52617a; }
+  /* Flags sub-game */
+  .flags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; max-height: 52vh; overflow-y: auto; padding-right: 2px; }
+  .flag-tile { border: 1px solid rgba(23,32,51,.15); border-radius: 9px; background: rgba(245,248,255,.96); cursor: pointer; padding: 6px 6px 5px; font-family: inherit; text-align: center; }
+  .flag-tile:hover { background: white; }
+  .flag-tile.active { border-color: rgba(124,45,18,.55); box-shadow: 0 0 0 2px rgba(124,45,18,.18); background: #fff; }
+  .flag-tile img { display: block; width: 100%; height: auto; border-radius: 5px; border: 1px solid rgba(23,32,51,.16); background: #fff; box-sizing: border-box; }
+  .flag-tile-name { display: block; margin-top: 4px; font-size: 9.5px; font-weight: 800; line-height: 1.2; color: #172033; }
+  .quiz-flag-option { position: relative; display: flex; align-items: center; justify-content: center; padding: 7px 8px 7px 24px; }
+  .quiz-flag-option img { display: block; max-width: 100%; max-height: 52px; width: auto; height: auto; border-radius: 4px; border: 1px solid rgba(23,32,51,.16); background: #fff; }
+  .quiz-flag-num { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 900; color: #6b7688; }
+  .quiz-colour-chip { display: inline-block; width: 13px; height: 13px; border-radius: 4px; border: 1px solid rgba(23,32,51,.28); margin-right: 7px; vertical-align: -2px; }
+  #quiz-photo-overlay.flag-photo #quiz-photo-img { object-fit: contain; object-position: 50% 50%; max-height: 30vh; border: 1px solid rgba(23,32,51,.16); background: #fff; box-sizing: border-box; }
+  #quiz-flag-inline { display: none; text-align: center; margin: 0 0 2px; }
+  #quiz-flag-inline.show { display: block; }
+  #quiz-flag-inline img { max-width: 210px; width: 68%; height: auto; border: 1px solid rgba(23,32,51,.16); border-radius: 6px; background: #fff; box-sizing: border-box; }
   #dispute-info.quiz-docked { left: auto; right: 14px; top: auto; bottom: 14px; width: min(324px, calc(100vw - 28px)); }
   @media (max-width: 680px) {
     #quiz-photo-overlay { left: auto; right: 10px; transform: none; top: 92px; width: min(230px, calc(100vw - 28px)); }
@@ -662,7 +677,7 @@
   .disputes-deepcut-row { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 750; color: #52617a; cursor: pointer; user-select: none; }
   .disputes-deepcut-row input { width: 13px; height: 13px; margin: 0; cursor: pointer; }
   @media (max-width: 680px) {
-    #disputes-panel, #royals-panel, #countries-panel, #brit-panel { width: min(212px, calc(100vw - 28px)); top: 88px; }
+    #disputes-panel, #royals-panel, #countries-panel, #brit-panel, #flags-panel { width: min(212px, calc(100vw - 28px)); top: 88px; }
     #dispute-info { width: min(276px, calc(100vw - 28px)); left: 14px; top: auto; bottom: 14px; }
   }
 </style>
@@ -740,10 +755,11 @@
     </label>
     <button id="toggle-capital-markers" class="quiz-start-btn capital-toggle-btn" type="button" aria-pressed="false">Show Capital Cities</button>
     <div class="quiz-section-title">Explore</div>
+    <button id="toggle-countries" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Full List of Countries</button>
     <button id="toggle-disputes" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Territorial &amp; Identity Disputes</button>
     <button id="toggle-royals" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Monarchies &amp; Royals</button>
-    <button id="toggle-countries" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Full List of Countries</button>
     <button id="toggle-brit" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">British Monarchy</button>
+    <button id="toggle-flags" class="quiz-start-btn disputes-toggle-btn" type="button" aria-pressed="false">Flags</button>
     <div class="quiz-section-title">Game</div>
     <button id="start-quiz" class="quiz-start-btn" type="button">Start 10-Question Quiz</button>
   </div>
@@ -758,6 +774,7 @@
   </div>
   <div id="quiz-question" class="quiz-question"></div>
   <div id="quiz-instruction" class="quiz-instruction"></div>
+  <div id="quiz-flag-inline"></div>
   <div id="quiz-options" class="quiz-options"></div>
   <div id="quiz-feedback" class="quiz-feedback"></div>
   <div id="quiz-actions" class="quiz-actions"></div>
@@ -819,6 +836,19 @@
     <label class="disputes-deepcut-row"><input type="checkbox" id="brit-deep-cuts" /> <span>Include deep cuts (harder)</span></label>
   </div>
   <div id="brit-list" class="disputes-list"></div>
+</div>
+
+<div id="flags-panel" aria-label="Flags of the world">
+  <div class="disputes-top">
+    <div class="disputes-title">Flags</div>
+    <button id="flags-close" class="disputes-x" type="button" aria-label="Close flags panel">×</button>
+  </div>
+  <div class="disputes-note">Every sovereign state’s flag, A–Z (UN members and observers; England, Scotland and Wales fly their own). Tap a flag to fly to its country.</div>
+  <div class="disputes-quiz-row">
+    <button id="start-flags-quiz" class="quiz-start-btn disputes-quiz-btn" type="button">Start the flags quiz</button>
+    <label class="disputes-deepcut-row"><input type="checkbox" id="flags-deep-cuts" /> <span>Include deep cuts (harder)</span></label>
+  </div>
+  <div id="flags-list" class="flags-grid"></div>
 </div>
 
 <div id="dispute-info" role="dialog" aria-label="Dispute details">
@@ -3757,6 +3787,7 @@ function openDisputesPanel() {
   closeRoyalsUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -4032,6 +4063,7 @@ function beginDisputesQuiz(disputeSubset) {
   closeRoyalsUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -4479,6 +4511,7 @@ function openBritPanel() {
   closeCountriesUI();
   closeDisputesUI();
   closeRoyalsUI();
+  closeFlagsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -4687,6 +4720,7 @@ function beginBritQuiz(britSubset) {
   closeRoyalsUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   closeDisputeInfo();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
@@ -4776,6 +4810,7 @@ function openCountriesPanel() {
   closeRoyalsUI();
   closeDisputesUI();
   closeBritUI();
+  closeFlagsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -5044,6 +5079,7 @@ function openRoyalsPanel() {
   closeDisputesUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
     if (worldRadio) worldRadio.checked = true;
@@ -5180,9 +5216,11 @@ const ROYAL_PHOTOS_PER_ROUND = 2;
 let quizPhotoToken = 0;
 function hideQuizPhoto() {
   quizPhotoToken++;
+  hideInlineQuizFlag();
   const ov = document.getElementById('quiz-photo-overlay');
   if (!ov) return;
   ov.classList.remove('active');
+  ov.classList.remove('flag-photo');
   const img = document.getElementById('quiz-photo-img');
   if (img) { img.onerror = null; img.onload = null; img.classList.remove('show'); img.classList.remove('photo-contain'); img.removeAttribute('src'); img.alt = ''; }
   const nm = document.getElementById('quiz-photo-name');
@@ -5377,6 +5415,7 @@ function beginRoyalsQuiz(royalSubset) {
   closeRoyalsUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   closeDisputeInfo();
   if (mapMode !== 'world') {
     const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
@@ -5441,6 +5480,347 @@ function bindHoverLabel(layer, htmlFactory) {
     mousemove: function(e) { if (hoverLabelsOn()) { const el = hoverLabelElement(); if (el && el.style.display !== 'block') showHoverLabel(htmlFactory(), e); else moveHoverLabel(e); } },
     mouseout: function() { hideHoverLabel(); }
   });
+}
+
+/* ---------------- Flags sub-game ---------------- */
+// Northern Ireland has had no official flag since 1973, and Afghanistan's is
+// currently contested, so both sit outside the flag pools (the map itself is
+// unaffected).
+const FLAG_EXCLUDED_ISOS = new Set(['gb-nir', 'af']);
+// The standard quiz pool: flags most people have a fighting chance with.
+// Everything else on the map is "deep cuts".
+const FLAG_TIER1 = new Set(['ie','gb-eng','gb-sct','gb-wls','fr','de','it','es','pt','nl','be','lu','ch','at','se','no','dk','fi','is','gr','pl','cz','sk','hu','ua','ru','tr','ro','bg','hr','rs','al','us','ca','mx','br','ar','cl','co','pe','ve','cu','jm','jp','cn','kr','kp','in','pk','bd','lk','np','th','vn','ph','id','my','sg','mn','kz','il','sa','ae','qa','kw','eg','ma','dz','tn','ly','za','ng','ke','gh','et','tz','sn','ci','cm','zw','zm','au','nz','fj','ir','iq','sy','jo','lb','ps','om','ye','bh','by','ge','am','az']);
+const FLAG_COLOUR_SWATCH = { red: '#d3312e', white: '#f7f7f4', blue: '#1d5fc2', green: '#1e8a44', yellow: '#f2c410', black: '#17181c', orange: '#e8761f', purple: '#7332a8', maroon: '#7c1f33' };
+const FLAG_COMMON_COLOURS = ['red', 'white', 'blue', 'green', 'yellow', 'black', 'orange'];
+// Principal colours per flag, including emblems. Flags whose emblems bring in
+// awkward extra shades (Spain, Mexico, Croatia, Fiji...) are deliberately left
+// out so every colour question has one clean, defensible answer.
+const FLAG_COLOURS = {
+  ie: ['green','white','orange'], 'gb-eng': ['white','red'], 'gb-sct': ['blue','white'], 'gb-wls': ['white','green','red'],
+  fr: ['blue','white','red'], it: ['green','white','red'], de: ['black','red','yellow'], be: ['black','yellow','red'],
+  nl: ['red','white','blue'], lu: ['red','white','blue'], pl: ['white','red'], ua: ['blue','yellow'],
+  se: ['blue','yellow'], no: ['red','white','blue'], dk: ['red','white'], fi: ['white','blue'], is: ['blue','white','red'],
+  ch: ['red','white'], at: ['red','white'], hu: ['red','white','green'], cz: ['white','red','blue'], sk: ['white','blue','red'],
+  ro: ['blue','yellow','red'], bg: ['white','green','red'], gr: ['blue','white'], tr: ['red','white'], ru: ['white','blue','red'],
+  ee: ['blue','black','white'], lv: ['red','white'], lt: ['yellow','green','red'], mc: ['red','white'], li: ['blue','red','yellow'],
+  mk: ['red','yellow'], al: ['red','black'], ba: ['blue','yellow','white'], xk: ['blue','yellow','white'], by: ['red','green','white'],
+  il: ['white','blue'], sa: ['green','white'], ae: ['red','green','white','black'], qa: ['maroon','white'],
+  kw: ['green','white','red','black'], bh: ['red','white'], jo: ['black','white','green','red'], lb: ['red','white','green'],
+  sy: ['red','white','black','green'], iq: ['red','white','black','green'], ye: ['red','white','black'], om: ['red','white','green'],
+  ps: ['black','white','green','red'], ir: ['green','white','red'], am: ['red','blue','orange'], ge: ['white','red'],
+  az: ['blue','red','green','white'], kz: ['blue','yellow'], kg: ['red','yellow'], tj: ['red','white','green','yellow'],
+  uz: ['blue','white','green','red'], mn: ['red','blue','yellow'],
+  cn: ['red','yellow'], jp: ['white','red'], kp: ['red','white','blue'], kr: ['white','red','blue','black'],
+  th: ['red','white','blue'], vn: ['red','yellow'], la: ['red','blue','white'], kh: ['blue','red','white'],
+  mm: ['yellow','green','red','white'], bd: ['green','red'], lk: ['maroon','yellow','orange','green'], np: ['red','blue','white'],
+  in: ['orange','white','green','blue'], pk: ['green','white'], mv: ['red','green','white'], bn: ['yellow','white','black','red'],
+  tl: ['red','yellow','black','white'], id: ['red','white'], my: ['red','white','blue','yellow'], sg: ['red','white'],
+  ph: ['blue','red','white','yellow'], au: ['blue','white','red'], nz: ['blue','white','red'], pg: ['red','black','yellow','white'],
+  ws: ['red','white','blue'], to: ['red','white'], sb: ['blue','green','yellow','white'], vu: ['red','black','green','yellow'],
+  fm: ['blue','white'], mh: ['blue','white','orange'], nr: ['blue','yellow','white'], pw: ['blue','yellow'],
+  tv: ['blue','white','red','yellow'], ki: ['red','yellow','white','blue'],
+  us: ['red','white','blue'], ca: ['red','white'], hn: ['blue','white'], cr: ['blue','white','red'], pa: ['red','white','blue'],
+  cu: ['blue','white','red'], jm: ['green','yellow','black'], bs: ['blue','yellow','black'], bb: ['blue','yellow','black'],
+  tt: ['red','white','black'], gd: ['red','yellow','green'], lc: ['blue','yellow','black','white'], vc: ['blue','yellow','green'],
+  ag: ['red','white','blue','yellow','black'], kn: ['green','yellow','black','red','white'], dm: ['green','yellow','black','white','red','purple'],
+  br: ['green','yellow','blue','white'], ar: ['blue','white','yellow'], cl: ['red','white','blue'], co: ['yellow','blue','red'],
+  ve: ['yellow','blue','red','white'], pe: ['red','white'], bo: ['red','yellow','green'], uy: ['white','blue','yellow'],
+  gy: ['green','white','yellow','black','red'], sr: ['green','white','red','yellow'],
+  za: ['red','white','blue','green','yellow','black'], ng: ['green','white'], gh: ['red','yellow','green','black'],
+  sn: ['green','yellow','red'], ci: ['orange','white','green'], ml: ['green','yellow','red'], gn: ['red','yellow','green'],
+  bf: ['red','green','yellow'], bj: ['green','yellow','red'], tg: ['green','yellow','red','white'], ne: ['orange','white','green'],
+  gm: ['red','blue','green','white'], gw: ['red','yellow','green','black'], sl: ['green','white','blue'], lr: ['red','white','blue'],
+  mr: ['green','yellow','red'], cv: ['blue','white','red','yellow'], st: ['green','yellow','red','black'],
+  cm: ['green','red','yellow'], cf: ['blue','white','green','yellow','red'], td: ['blue','yellow','red'], cg: ['green','yellow','red'],
+  cd: ['blue','red','yellow'], ga: ['green','yellow','blue'], ao: ['red','black','yellow'], zm: ['green','red','black','orange'],
+  zw: ['green','yellow','red','black','white'], mw: ['black','red','green'], mz: ['green','black','yellow','red','white'],
+  bw: ['blue','white','black'], na: ['blue','red','green','white','yellow'], ls: ['blue','white','green','black'],
+  mg: ['white','red','green'], mu: ['red','blue','yellow','green'], sc: ['blue','yellow','red','white','green'],
+  km: ['yellow','white','red','blue','green'], dj: ['blue','green','white','red'], er: ['green','red','blue','yellow'],
+  et: ['green','yellow','red','blue'], so: ['blue','white'], ke: ['black','red','green','white'], rw: ['blue','yellow','green'],
+  bi: ['red','white','green'], tz: ['green','yellow','black','blue'], ss: ['black','red','green','white','blue','yellow'],
+  eg: ['red','white','black','yellow'], ly: ['red','black','green','white'], tn: ['red','white'], dz: ['green','white','red'],
+  ma: ['red','green'], sd: ['red','white','black','green']
+};
+function flagIsoForCandidate(c) {
+  for (const f of (c && c.features) || []) {
+    const iso = flagIsoForFeature((f && f.properties) || {});
+    if (iso && !FLAG_EXCLUDED_ISOS.has(iso)) return iso;
+  }
+  return null;
+}
+function flagImageUrls(iso) {
+  // applyImgWithFallback expects { sized, base }: it tries sized first, then base.
+  return { sized: 'https://flagcdn.com/w640/' + iso + '.png', base: 'https://flagcdn.com/w320/' + iso + '.png' };
+}
+let flagsEntries = null;
+function buildFlagsEntries() {
+  const out = [];
+  for (const c of getVisibleQuizCandidates()) {
+    const iso = flagIsoForCandidate(c);
+    if (!iso) continue;
+    out.push({ key: c.key, name: c.name, iso, candidate: c, colours: FLAG_COLOURS[iso] || null, tier1: FLAG_TIER1.has(iso) });
+  }
+  out.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  flagsEntries = out;
+  return out;
+}
+function showQuizFlagPhoto(iso, caption, keepCaption) {
+  hideQuizPhoto();
+  const ov = document.getElementById('quiz-photo-overlay');
+  if (!ov || !iso) return;
+  ov.classList.add('active');
+  ov.classList.add('flag-photo');
+  const nm = document.getElementById('quiz-photo-name');
+  const img = document.getElementById('quiz-photo-img');
+  if (!img) return;
+  const token = quizPhotoToken;
+  img.alt = caption ? ('Flag of ' + caption) : 'Mystery flag';
+  img.onload = function() {
+    if (token !== quizPhotoToken) return;
+    img.classList.add('show');
+    if (nm && caption && keepCaption) { nm.textContent = caption; nm.classList.add('show'); nm.classList.add('caption'); }
+  };
+  applyImgWithFallback(img, flagImageUrls(iso), null);
+}
+function revealQuizFlag(q) {
+  if (!q || !q.flagIso) return;
+  // Find questions keep their flag docked in the quiz panel; popping the big
+  // overlay here would cover the very country the map just revealed.
+  if (q.type === 'find') return;
+  showQuizFlagPhoto(q.flagIso, q.flagRevealCaption || (q.candidate && q.candidate.name) || '', true);
+}
+function hideInlineQuizFlag() {
+  const host = document.getElementById('quiz-flag-inline');
+  if (!host) return;
+  host.classList.remove('show');
+  host.innerHTML = '';
+}
+function showInlineQuizFlag(iso, alt) {
+  const host = document.getElementById('quiz-flag-inline');
+  if (!host || !iso) return;
+  host.innerHTML = '';
+  const img = document.createElement('img');
+  img.alt = alt || 'Mystery flag';
+  img.decoding = 'async';
+  applyImgWithFallback(img, flagImageUrls(iso), null);
+  host.appendChild(img);
+  host.classList.add('show');
+}
+let flagsHighlightLayer = null, activeFlagKey = null;
+function flagsPanelEl() { return document.getElementById('flags-panel'); }
+function flagsPanelOpen() { const p = flagsPanelEl(); return !!(p && p.classList.contains('active')); }
+function clearFlagsHighlight() {
+  if (flagsHighlightLayer && map) map.removeLayer(flagsHighlightLayer);
+  flagsHighlightLayer = null;
+  activeFlagKey = null;
+  const list = document.getElementById('flags-list');
+  if (list) list.querySelectorAll('.flag-tile.active').forEach(function(x) { x.classList.remove('active'); });
+}
+function closeFlagsUI() {
+  const p = flagsPanelEl();
+  const wasOpen = !!(p && p.classList.contains('active'));
+  if (p) p.classList.remove('active');
+  clearFlagsHighlight();
+  updateFlagsButtonState();
+  return wasOpen;
+}
+function openFlagsPanel() {
+  if (!map) return;
+  if (quizState) stopQuiz(false);
+  closeDisputesUI();
+  closeRoyalsUI();
+  closeCountriesUI();
+  closeBritUI();
+  if (mapMode !== 'world') {
+    const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
+    if (worldRadio) worldRadio.checked = true;
+    mapMode = 'world';
+    applyMapMode(true);
+  }
+  buildFlagsEntries();
+  renderFlagsList();
+  const p = flagsPanelEl();
+  if (p) p.classList.add('active');
+  updateFlagsButtonState();
+}
+function toggleFlagsPanel() { if (flagsPanelOpen()) { closeFlagsUI(); closeDisputeInfo(); } else openFlagsPanel(); }
+function updateFlagsButtonState() {
+  const btn = document.getElementById('toggle-flags');
+  if (!btn) return;
+  const open = flagsPanelOpen();
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+  btn.textContent = open ? 'Hide Flags' : 'Flags';
+}
+function renderFlagsList() {
+  const list = document.getElementById('flags-list');
+  if (!list) return;
+  list.innerHTML = '';
+  for (const f of flagsEntries || []) {
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'flag-tile';
+    tile.dataset.flagKey = f.key;
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.alt = 'Flag of ' + f.name;
+    img.src = 'https://flagcdn.com/w160/' + f.iso + '.png';
+    img.onerror = function() { tile.style.display = 'none'; };
+    const nm = document.createElement('span');
+    nm.className = 'flag-tile-name';
+    nm.textContent = f.name;
+    tile.appendChild(img);
+    tile.appendChild(nm);
+    tile.addEventListener('click', function() { selectFlagEntry(f.key); });
+    list.appendChild(tile);
+  }
+}
+function selectFlagEntry(key) {
+  if (!map) return;
+  const f = (flagsEntries || []).find(function(x) { return x.key === key; });
+  if (!f || !f.candidate) return;
+  ensureCountryPane();
+  clearFlagsHighlight();
+  const c = f.candidate;
+  let feats = (c.features || []).filter(function(x) { return x && x.geometry; });
+  if (!feats.length) feats = (c.layers || []).map(function(l) { return l && l.toGeoJSON ? l.toGeoJSON() : null; }).filter(function(x) { return x && x.geometry; });
+  const fc = { type: 'FeatureCollection', features: feats };
+  flagsHighlightLayer = L.layerGroup([
+    L.geoJSON(fc, { pane: 'countryListPane', interactive: false, style: COUNTRY_HIGHLIGHT_CASING }),
+    L.geoJSON(fc, { pane: 'countryListPane', interactive: false, style: COUNTRY_HIGHLIGHT_STYLE })
+  ]).addTo(map);
+  activeFlagKey = key;
+  const list = document.getElementById('flags-list');
+  if (list) list.querySelectorAll('.flag-tile').forEach(function(x) { x.classList.toggle('active', x.dataset.flagKey === key); });
+  const b = focusBoundsFromParts(c) || candidateBounds(c);
+  if (b && b.isValid && b.isValid()) map.flyToBounds(b.pad(0.85), { maxZoom: 6, duration: 0.9 });
+  showCountryInfoCard(c);
+}
+function flagsDeepCutsOn() {
+  const el = document.getElementById('flags-deep-cuts');
+  return !!(el && el.checked);
+}
+function flagQuizPool(includeDeepCuts) {
+  return (flagsEntries || []).filter(function(f) { return includeDeepCuts || f.tier1; });
+}
+function flagQuizCandidate(f) {
+  // Keep the underlying world candidate (its key matches quizKeyForFeature, so
+  // find-on-map clicks resolve) and tag the flag entry on for retry/review.
+  return Object.assign({}, f.candidate, { flag: f });
+}
+function flagColourQuestion(f) {
+  const colours = f.colours || [];
+  if (colours.length >= 3) {
+    const absent = FLAG_COMMON_COLOURS.filter(function(c) { return colours.indexOf(c) === -1; });
+    const present = sample(colours.filter(function(c) { return FLAG_COLOUR_SWATCH[c]; }), 3);
+    if (!absent.length || present.length < 3) return null;
+    const answer = sample(absent, 1)[0];
+    return {
+      type: 'flag-colour', candidate: flagQuizCandidate(f), flagIso: f.iso, optionKind: 'colour',
+      prompt: 'Which of these colours is NOT in the flag of ' + f.name + '?',
+      instruction: 'The country is highlighted on the map \u2014 its flag is revealed after you answer. Tap a colour or press 1\u20134.',
+      options: shuffleCopy(present.concat([answer])),
+      answer
+    };
+  }
+  if (colours.length === 2) {
+    const answer = sample(colours, 1)[0];
+    const absent = sample(FLAG_COMMON_COLOURS.filter(function(c) { return colours.indexOf(c) === -1; }), 3);
+    if (absent.length < 3) return null;
+    return {
+      type: 'flag-colour', candidate: flagQuizCandidate(f), flagIso: f.iso, optionKind: 'colour',
+      prompt: 'Which of these colours IS in the flag of ' + f.name + '?',
+      instruction: 'The country is highlighted on the map \u2014 its flag is revealed after you answer. Tap a colour or press 1\u20134.',
+      options: shuffleCopy(absent.concat([answer])),
+      answer
+    };
+  }
+  return null;
+}
+function buildFlagQuestions(subjectPool, allEligible) {
+  const pool = shuffleCopy(subjectPool);
+  const targetCount = Math.min(QUIZ_TOTAL_QUESTIONS, Math.max(1, pool.length));
+  const namePool = allEligible.map(function(f) { return f.name; });
+  const indices = [];
+  for (let i = 0; i < targetCount; i++) indices.push(i);
+  // Roughly three colour posers, two pick-the-flag, two find-on-map; the rest
+  // are straight "whose flag is this?" identifications.
+  const colourEligible = indices.filter(function(i) { return ((pool[i % pool.length].colours) || []).length >= 2; });
+  const colourSlots = new Set(sample(colourEligible, Math.min(3, colourEligible.length)));
+  const rest = indices.filter(function(i) { return !colourSlots.has(i); });
+  const pickSlots = new Set(sample(rest, Math.min(2, Math.max(0, rest.length - 2))));
+  const rest2 = rest.filter(function(i) { return !pickSlots.has(i); });
+  const findSlots = new Set(sample(rest2, Math.min(2, rest2.length)));
+  const questions = [];
+  for (let i = 0; i < targetCount; i++) {
+    const f = pool[i % pool.length];
+    if (colourSlots.has(i)) {
+      const cq = flagColourQuestion(f);
+      if (cq) { questions.push(cq); continue; }
+    }
+    if (pickSlots.has(i) && allEligible.length >= 4) {
+      const others = sample(allEligible.filter(function(o) { return o.iso !== f.iso; }), 3);
+      const opts = shuffleCopy([f].concat(others));
+      const isoByName = {};
+      for (const o of opts) isoByName[norm(o.name)] = o.iso;
+      questions.push({
+        type: 'flag-pick', candidate: flagQuizCandidate(f), flagIso: f.iso, optionKind: 'flagimg', optionIsoByName: isoByName,
+        prompt: 'Which of these is the flag of ' + f.name + '?',
+        instruction: 'The country is highlighted on the map. Tap the correct flag or press 1\u20134.',
+        options: opts.map(function(o) { return o.name; }),
+        answer: f.name
+      });
+      continue;
+    }
+    if (findSlots.has(i)) {
+      questions.push({
+        type: 'find', candidate: flagQuizCandidate(f), flagIso: f.iso, flagShowDuringQuestion: true,
+        prompt: 'Find the country that flies this flag',
+        instruction: 'Study the flag, then click the correct landmass. You get two attempts. If you are stuck, use \u201cIt\u2019s beside / nearest to\u201d for a neighbouring/nearby clue, or \u201cI give up! Show me...\u201d to reveal the answer.',
+        answer: f.name,
+        attemptsLeft: 2,
+        clueUsed: false
+      });
+      continue;
+    }
+    questions.push({
+      type: 'flag-identify', candidate: flagQuizCandidate(f), flagIso: f.iso, flagShowDuringQuestion: true,
+      prompt: 'Which country does this flag belong to?',
+      instruction: 'Study the flag, then choose \u2014 tap an answer or press 1\u20134.',
+      options: optionSet(f.name, namePool),
+      answer: f.name
+    });
+  }
+  return questions;
+}
+function startFlagsQuiz() { beginFlagsQuiz(null); }
+function beginFlagsQuiz(flagSubset) {
+  if (!map) return;
+  hideHoverLabel(); map.closePopup(); openId = null;
+  closeDisputesUI();
+  closeRoyalsUI();
+  closeCountriesUI();
+  closeBritUI();
+  closeFlagsUI();
+  closeDisputeInfo();
+  if (mapMode !== 'world') {
+    const worldRadio = document.querySelector('input[name="map-mode"][value="world"]');
+    if (worldRadio) worldRadio.checked = true;
+    mapMode = 'world';
+    applyMapMode(true);
+  }
+  buildFlagsEntries();
+  const allEligible = flagsEntries || [];
+  const pool = (flagSubset && flagSubset.length) ? flagSubset : flagQuizPool(flagsDeepCutsOn());
+  if (allEligible.length < 4 || !pool.length) return;
+  quizState = { mode: mapMode, kind: 'flags', questions: buildFlagQuestions(pool, allEligible), index: 0, score: 0, locked: false, awaitingMapClick: false };
+  if (!isControlPanelCollapsed()) {
+    setControlPanelCollapsed(true);
+    royalsAutoCollapsedControls = true; // shared restore flag; stopQuiz() re-expands the controls
+  }
+  renderQuizQuestion();
 }
 
 const QUIZ_TOTAL_QUESTIONS = 10;
@@ -5591,6 +5971,8 @@ function buildQuizQuestions(candidates, distractorPool) {
     const candidate = pool[i % pool.length];
     const possibleTypes = ['identify', 'find'];
     if (capitalPool.length >= 4 && quizCapitalEligibleCandidate(candidate)) possibleTypes.push('capital');
+    const candidateFlagIso = (mapMode === 'world') ? flagIsoForCandidate(candidate) : null;
+    if (candidateFlagIso) possibleTypes.push('flag');
     const type = possibleTypes[Math.floor(Math.random() * possibleTypes.length)];
     if (type === 'capital') {
       questions.push({
@@ -5608,6 +5990,14 @@ function buildQuizQuestions(candidates, distractorPool) {
         answer: candidate.name,
         attemptsLeft: 2,
         clueUsed: false
+      });
+    } else if (type === 'flag') {
+      questions.push({
+        type: 'flag-identify', candidate, flagIso: candidateFlagIso, flagShowDuringQuestion: true,
+        prompt: 'Which country does this flag belong to?',
+        instruction: 'Study the flag, then choose — tap an answer or press 1–4.',
+        options: optionSet(candidate.name, namePool),
+        answer: candidate.name
       });
     } else {
       questions.push({
@@ -5887,11 +6277,33 @@ function renderQuizOptions(question, hidden=false) {
   if (!host) return;
   host.innerHTML = '';
   if (hidden) return;
-  question.options.forEach(function(opt) {
+  question.options.forEach(function(opt, idx) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'quiz-choice-btn';
-    btn.textContent = opt;
+    btn.dataset.quizValue = opt;
+    if (question.optionKind === 'flagimg') {
+      btn.classList.add('quiz-flag-option');
+      btn.setAttribute('aria-label', 'Flag option ' + (idx + 1));
+      const num = document.createElement('span');
+      num.className = 'quiz-flag-num';
+      num.textContent = String(idx + 1);
+      const img = document.createElement('img');
+      const iso = (question.optionIsoByName || {})[norm(opt)];
+      if (iso) img.src = 'https://flagcdn.com/w320/' + iso + '.png';
+      img.alt = '';
+      img.decoding = 'async';
+      btn.appendChild(num);
+      btn.appendChild(img);
+    } else if (question.optionKind === 'colour') {
+      const chip = document.createElement('span');
+      chip.className = 'quiz-colour-chip';
+      chip.style.background = FLAG_COLOUR_SWATCH[opt] || '#ccc';
+      btn.appendChild(chip);
+      btn.appendChild(document.createTextNode(opt.charAt(0).toUpperCase() + opt.slice(1)));
+    } else {
+      btn.textContent = opt;
+    }
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       answerQuizChoice(opt, btn);
@@ -5909,7 +6321,8 @@ function answerQuizChoice(value, btn) {
   if (btn) btn.classList.add(correct ? 'correct' : 'wrong');
   document.querySelectorAll('#quiz-options .quiz-choice-btn').forEach(function(b) {
     b.disabled = true;
-    if (norm(b.textContent) === norm(q.answer)) b.classList.add('correct');
+    const bval = (b.dataset && b.dataset.quizValue != null) ? b.dataset.quizValue : b.textContent;
+    if (norm(bval) === norm(q.answer)) b.classList.add('correct');
   });
   if (correct) { quizState.score++; quizSetFeedback('Correct!', 'good'); flashQuizPanel('quiz-correct-flash'); }
   else { quizSetFeedback(`Incorrect — the answer was ${q.answer}.`, 'bad'); flashQuizPanel('quiz-wrong-flash'); highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
@@ -5924,6 +6337,10 @@ function answerQuizChoice(value, btn) {
   if (q.candidate && q.candidate.brit) {
     if (correct) { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
     showBritQuizInfo(q.candidate.brit);
+  }
+  if (q.candidate && q.flagIso) {
+    if (correct) { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
+    revealQuizFlag(q);
   }
   renderNextQuizAction();
 }
@@ -5949,11 +6366,15 @@ function renderQuizQuestion() {
   quizState.locked = false;
   quizState.awaitingMapClick = q.type === 'find';
   q.attemptsLeft = 2;
-  const isPanelQuiz = quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit';
+  const isPanelQuiz = quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit' || quizState.kind === 'flags';
   if (isPanelQuiz) closeDisputeInfo();
   hideQuizPhoto();
+  if (q.flagIso && q.flagShowDuringQuestion) {
+    if (q.type === 'find') showInlineQuizFlag(q.flagIso, null);
+    else showQuizFlagPhoto(q.flagIso, null, false);
+  }
   const quizTitleEl = document.querySelector('#quiz-game-panel .quiz-game-title');
-  if (quizTitleEl) quizTitleEl.textContent = quizState.kind === 'disputes' ? 'Disputes quiz' : (quizState.kind === 'royals' ? 'Royals quiz' : (quizState.kind === 'brit' ? 'British Monarchy quiz' : 'Map quiz'));
+  if (quizTitleEl) quizTitleEl.textContent = quizState.kind === 'disputes' ? 'Disputes quiz' : (quizState.kind === 'royals' ? 'Royals quiz' : (quizState.kind === 'brit' ? 'British Monarchy quiz' : (quizState.kind === 'flags' ? 'Flags quiz' : 'Map quiz')));
   const panel = quizPanelEl();
   if (panel) { panel.classList.add('active'); panel.classList.toggle('disputes-quiz', isPanelQuiz); }
   const prog = document.getElementById('quiz-progress');
@@ -5983,10 +6404,11 @@ function renderQuizQuestion() {
       quizSetFeedback(`The answer was ${q.answer}.`, 'bad');
       highlightQuizCandidate(q.candidate);
       zoomToCandidate(q.candidate);
+      revealQuizFlag(q);
       renderNextQuizAction();
     }, false);
     addQuizAction('End quiz', function() { stopQuiz(false); }, false);
-  } else if (q.type === 'dispute-clue' || q.type === 'royal-clue' || q.type === 'royal-country' || q.type === 'royal-realm' || q.type === 'royal-photo-country' || q.type === 'royal-photo-not' || q.type === 'brit-clue' || q.type === 'brit-photo' || q.type === 'brit-order' || q.type === 'brit-house') {
+  } else if (q.type === 'dispute-clue' || q.type === 'royal-clue' || q.type === 'royal-country' || q.type === 'royal-realm' || q.type === 'royal-photo-country' || q.type === 'royal-photo-not' || q.type === 'brit-clue' || q.type === 'brit-photo' || q.type === 'brit-order' || q.type === 'brit-house' || q.type === 'flag-identify') {
     clearQuizHighlight();
     if (quizState.kind === 'brit') map.flyToBounds(BRIT_ISLES_BOUNDS, { animate: true, duration: 0.65, padding: [2, 2] });
     else zoomToCurrentQuizExtent();
@@ -5997,7 +6419,7 @@ function renderQuizQuestion() {
     highlightQuizCandidate(q.candidate);
     zoomToCandidate(q.candidate);
     renderQuizOptions(q, false);
-    if (q.type === 'identify' || q.type === 'dispute-name' || q.type === 'dispute-parties' || q.type === 'royal-monarch' || q.type === 'royal-title') {
+    if (q.type === 'identify' || q.type === 'dispute-name' || q.type === 'dispute-parties' || q.type === 'royal-monarch' || q.type === 'royal-title' || q.type === 'flag-colour' || q.type === 'flag-pick') {
       addQuizAction('Reposition the view...', function() {
         if (!quizState || quizState.locked) return;
         highlightQuizCandidate(q.candidate);
@@ -6062,6 +6484,20 @@ function renderQuizReview(missed) {
       sub.className = 'quiz-review-sub';
       sub.textContent = 'r. ' + q.candidate.brit.reign + ' · ' + q.candidate.brit.house;
       btn.appendChild(sub);
+    } else if (q.candidate.flag) {
+      const sub = document.createElement('span');
+      sub.className = 'quiz-review-sub';
+      const fimg = document.createElement('img');
+      fimg.src = 'https://flagcdn.com/w80/' + q.candidate.flag.iso + '.png';
+      fimg.alt = '';
+      fimg.style.height = '11px';
+      fimg.style.verticalAlign = '-1px';
+      fimg.style.marginRight = '5px';
+      fimg.style.border = '1px solid rgba(23,32,51,.2)';
+      fimg.style.borderRadius = '2px';
+      sub.appendChild(fimg);
+      sub.appendChild(document.createTextNode(q.type === 'flag-colour' ? ('Colour answer: ' + q.answer) : 'Tap to see it and its flag'));
+      btn.appendChild(sub);
     }
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -6070,6 +6506,7 @@ function renderQuizReview(missed) {
       if (q.candidate.dispute) showDisputeQuizInfo(q.candidate.dispute);
       if (q.candidate.royal) showRoyalQuizInfo(q.candidate.royal);
       if (q.candidate.brit) showBritQuizInfo(q.candidate.brit);
+      if (q.candidate.flag) showQuizFlagPhoto(q.candidate.flag.iso, q.candidate.name, true);
     });
     host.appendChild(btn);
   }
@@ -6095,13 +6532,19 @@ function retryMissedQuizQuestions() {
     beginBritQuiz(missedBrit);
     return;
   }
+  if (quizKind === 'flags') {
+    const missedFlags = missed.map(function(c) { return c && c.flag; }).filter(Boolean);
+    if (!missedFlags.length) { startFlagsQuiz(); return; }
+    beginFlagsQuiz(missedFlags);
+    return;
+  }
   if (!missed.length) { startQuiz(); return; }
   beginQuiz(missed);
 }
 function finishQuiz() {
   if (!quizState) return;
   clearQuizHighlight();
-  if (quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit') closeDisputeInfo();
+  if (quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit' || quizState.kind === 'flags') closeDisputeInfo();
   hideQuizPhoto();
   quizState.awaitingMapClick = false;
   const panel = quizPanelEl();
@@ -6112,16 +6555,16 @@ function finishQuiz() {
   if (questionEl) questionEl.textContent = `Result: ${quizState.score} / ${quizState.questions.length}`;
   const missed = quizMissedQuestions();
   const instructionEl = document.getElementById('quiz-instruction');
-  const quizKindTitle = quizState.kind === 'disputes' ? 'Territorial disputes' : (quizState.kind === 'royals' ? 'Monarchies & Royals' : (quizState.kind === 'brit' ? 'British Monarchy' : (QUIZ_MODE_TITLES[mapMode] || 'Current map')));
+  const quizKindTitle = quizState.kind === 'disputes' ? 'Territorial disputes' : (quizState.kind === 'royals' ? 'Monarchies & Royals' : (quizState.kind === 'brit' ? 'British Monarchy' : (quizState.kind === 'flags' ? 'Flags' : (QUIZ_MODE_TITLES[mapMode] || 'Current map'))));
   if (instructionEl) instructionEl.textContent = `${quizKindTitle} quiz complete.` + (missed.length ? ' Tap a missed answer below to see it on the map.' : ' Full marks!');
   clearQuizOptions(); quizSetFeedback(''); clearQuizActions();
   renderQuizReview(missed);
   if (missed.length) addQuizAction(missed.length === 1 ? 'Retry the one you missed' : `Retry the ${missed.length} you missed`, retryMissedQuizQuestions, true);
-  addQuizAction('Play again', quizState.kind === 'disputes' ? startDisputesQuiz : (quizState.kind === 'royals' ? startRoyalsQuiz : (quizState.kind === 'brit' ? startBritQuiz : startQuiz)), missed.length === 0);
+  addQuizAction('Play again', quizState.kind === 'disputes' ? startDisputesQuiz : (quizState.kind === 'royals' ? startRoyalsQuiz : (quizState.kind === 'brit' ? startBritQuiz : (quizState.kind === 'flags' ? startFlagsQuiz : startQuiz))), missed.length === 0);
   addQuizAction('Back to map', function() { stopQuiz(false); });
 }
 function stopQuiz(silent=true) {
-  const wasPanelQuiz = !!(quizState && (quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit'));
+  const wasPanelQuiz = !!(quizState && (quizState.kind === 'disputes' || quizState.kind === 'royals' || quizState.kind === 'brit' || quizState.kind === 'flags'));
   quizState = null;
   if (quizCluePanTimer) { window.clearTimeout(quizCluePanTimer); quizCluePanTimer = null; }
   clearQuizHighlight(); hideHoverLabel();
@@ -6146,6 +6589,7 @@ function beginQuiz(candidateSubset) {
   closeRoyalsUI();
   closeCountriesUI();
   closeBritUI();
+  closeFlagsUI();
   const candidates = getVisibleQuizCandidates();
   if (candidates.length < 4) {
     const panel = quizPanelEl();
@@ -6175,6 +6619,7 @@ function handleQuizLayerClick(layer, feature, e) {
     highlightQuizCandidate(q.candidate);
     zoomToCandidate(q.candidate);
     flashQuizPanel('quiz-correct-flash');
+    revealQuizFlag(q);
     renderNextQuizAction();
   } else {
     q.attemptsLeft = Math.max(0, (q.attemptsLeft || 1) - 1);
@@ -6188,6 +6633,7 @@ function handleQuizLayerClick(layer, feature, e) {
       quizSetFeedback(`Incorrect — the answer was ${q.answer}.`, 'bad');
       highlightQuizCandidate(q.candidate);
       zoomToCandidate(q.candidate);
+      revealQuizFlag(q);
       renderNextQuizAction();
     }
   }
@@ -6399,7 +6845,7 @@ function createControlPanel() {
     input.addEventListener('change', function() {
       if (!this.checked) return;
       stopQuiz(true);
-      if (this.value !== 'world') { closeDisputesUI(); closeRoyalsUI(); closeCountriesUI(); closeBritUI(); }
+      if (this.value !== 'world') { closeDisputesUI(); closeRoyalsUI(); closeCountriesUI(); closeBritUI(); closeFlagsUI(); }
       mapMode = this.value;
       applyMapMode(true);
     });
@@ -6439,6 +6885,14 @@ function createControlPanel() {
   if (startBritQuizBtn) startBritQuizBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); startBritQuiz(); });
   const britPanelDiv = document.getElementById('brit-panel');
   if (britPanelDiv) { L.DomEvent.disableClickPropagation(britPanelDiv); L.DomEvent.disableScrollPropagation(britPanelDiv); }
+  const flagsBtn = document.getElementById('toggle-flags');
+  if (flagsBtn) flagsBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); toggleFlagsPanel(); });
+  const flagsCloseBtn = document.getElementById('flags-close');
+  if (flagsCloseBtn) flagsCloseBtn.addEventListener('click', function() { closeFlagsUI(); closeDisputeInfo(); });
+  const startFlagsQuizBtn = document.getElementById('start-flags-quiz');
+  if (startFlagsQuizBtn) startFlagsQuizBtn.addEventListener('click', function(e) { L.DomEvent.stop(e); startFlagsQuiz(); });
+  const flagsPanelDiv = document.getElementById('flags-panel');
+  if (flagsPanelDiv) { L.DomEvent.disableClickPropagation(flagsPanelDiv); L.DomEvent.disableScrollPropagation(flagsPanelDiv); }
   const disputeInfoCloseBtn = document.getElementById('dispute-info-close');
   if (disputeInfoCloseBtn) disputeInfoCloseBtn.addEventListener('click', function() { closeDisputeInfo(); });
   const disputesPanelDiv = document.getElementById('disputes-panel');
@@ -7379,7 +7833,7 @@ async function startQuizMap() {
 (function setupQuizKeyboardShortcuts() {
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      if (closeDisputeInfo() || closeBritUI() || closeCountriesUI() || closeRoyalsUI() || closeDisputesUI()) { e.preventDefault(); }
+      if (closeDisputeInfo() || closeFlagsUI() || closeBritUI() || closeCountriesUI() || closeRoyalsUI() || closeDisputesUI()) { e.preventDefault(); }
       return;
     }
     if (!quizState) return;
