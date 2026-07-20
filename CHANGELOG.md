@@ -1,5 +1,18 @@
 # Changelog
 
+## v107 — Ulster Banner
+
+- Northern Ireland now flies the Ulster Banner in flag play, replacing the Union Flag placeholder, and joins the quizzes on the same footing as the other home nations: tier-1 pool, find and identify questions, and colour questions (white, red, yellow). The quiz-integrity concern that kept NI out was specific to the Union Jack — a distinct flag removes it.
+
+## v106 — Sovereignty-aware flags
+
+- Fixed: find-the-flag questions rejected clicks on a country's sub-national map units — Belgium's Flemish Region, Walloon Region and Brussels being the reported case, with some twenty more sovereigns affected (Bosnia's entities, Zanzibar, Réunion, Svalbard, the Azores...). Flag play now groups every map unit under the sovereign whose flag it flies: a click anywhere in the country counts, and the whole country highlights on the reveal. The map itself is untouched — units keep their own borders, labels and popups.
+- Fixed: England, Scotland and Wales showed the Union Jack in flag play. Natural Earth stamps ISO_A2_EH = GB on all the home nations, which outranked the name-based overrides; the override map now wins, so each nation flies its own flag.
+- New: Northern Ireland joins the flag browser under the Union Flag — it has had no distinct official flag since 1973 — and sits out the quizzes.
+- Grouping is by resolved flag rather than Natural Earth's sovereignty codes, which keeps Palestine (with Gaza and the West Bank as clickable units) its own entry rather than folding into Israel, where the dataset files it.
+- World-quiz flag questions now come only from sovereign entries, with sovereign names as answer options — no more Belgian flag questions answered “Walloon Region”.
+- Main world-quiz find questions also accept any unit of the answer's sovereign (clicking the Azores counts for Portugal).
+
 ## v105 — Quiz flags fixed and docked
 
 - Fixed: quiz flag images never appeared — the shared image loader expects a sized/base URL pair and was being handed a plain list, so the overlay image never received a valid source. Flags now load at w640 with a w320 fallback.
