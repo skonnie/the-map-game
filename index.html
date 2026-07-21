@@ -32,7 +32,18 @@
     width: 164px;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     user-select: none;
+    /* Never outgrow the viewport, and leave live room for the learn-about
+       widget in the same right-hand lane (--info-clearance is kept up to date
+       from its real rendered height). Scroll internally beyond that. */
+    max-height: max(110px, calc(100vh - 24px - var(--info-clearance, 0px)));
+    max-height: max(110px, calc(100dvh - 24px - var(--info-clearance, 0px)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
+  .quiz-control::-webkit-scrollbar { width: 6px; }
+  .quiz-control::-webkit-scrollbar-thumb { background: rgba(23,32,51,.28); border-radius: 3px; }
+  .quiz-control::-webkit-scrollbar-track { background: transparent; }
   .quiz-control-header {
     display: flex;
     align-items: center;
@@ -984,6 +995,17 @@ const MAP_MODE_INFO = {
   }
 };
 
+function updateInfoClearance() {
+  const widget = document.getElementById('country-info-widget');
+  const root = document.documentElement;
+  if (!root) return;
+  let clearance = 0;
+  if (widget && widget.offsetParent !== null && widget.offsetHeight > 0) {
+    // Widget height + its 14px bottom offset + a 10px breathing gap.
+    clearance = Math.ceil(widget.offsetHeight + 24);
+  }
+  root.style.setProperty('--info-clearance', clearance + 'px');
+}
 function setupInfoWidget() {
   const widget = document.getElementById('country-info-widget');
   const toggle = document.getElementById('country-info-toggle');
@@ -999,8 +1021,14 @@ function setupInfoWidget() {
     const collapsed = widget.classList.toggle('collapsed');
     toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     updateInfoWidget();
+    updateInfoClearance();
   });
+  if (typeof ResizeObserver !== 'undefined') {
+    try { new ResizeObserver(function() { updateInfoClearance(); }).observe(widget); } catch (e) {}
+  }
+  window.addEventListener('resize', updateInfoClearance);
   updateInfoWidget();
+  updateInfoClearance();
 }
 
 function infoClean(v) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## v110 — The panel learns its place
+
+- The control panel is now viewport-aware: it caps its height to the screen and scrolls internally (thin scrollbar) instead of growing past the bottom edge on smaller resolutions. Mouse-wheel scrolling inside the panel does not zoom the map.
+- It also yields to the learn-about widget: a live clearance tracks the widget's real rendered height (ResizeObserver, plus resize and toggle hooks), so expanding the widget — or a long country summary loading into it — reclaims space from the panel instantly, and collapsing gives it back. The widget keeps its existing 68vh/520px cap, making the right-edge partition one-directional and stable: widget first, panel takes the rest.
+- On extremely short viewports the panel keeps a 110px minimum so its header and collapse control stay reachable; in that corner case the widget may cover part of the panel, which then scrolls.
+
 ## v109 — Ten times lighter
 
 - The world map loads from a self-hosted bundle: both admin-0 layers share one simplified, quantized TopoJSON (data/world_admin0.topo.json) and capitals ship as a 216-row file (data/world_capitals.json). About 0.82 MB gzipped in total instead of ~9.8 MB, ~3.5 MB parsed instead of ~31 MB, and ~175,000 rendered points instead of 1.1 million — faster boot and smoother pan/zoom, since the SVG renderer re-projects six times fewer points on every zoom step.
