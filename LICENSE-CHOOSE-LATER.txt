@@ -1,9 +1,0 @@
-No open-source licence has been selected yet.
-
-Until a licence is chosen, assume all rights are reserved by the project owner.
-
-Common choices to consider later:
-
-- MIT Licence: permissive, simple, allows reuse with attribution.
-- Creative Commons licences: useful for non-code content, not ideal for software alone.
-- All rights reserved: keep the project visible but do not grant reuse rights.
