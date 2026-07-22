@@ -1,5 +1,20 @@
 # Changelog
 
+## v113 — Fast zoom
+
+- Two fast-zoom buttons join the standard Leaflet pill, top to bottom: ++ / + / − / −−. Each fast press jumps 20% of the current mode's zoom range — five presses cover minimum to maximum — computed live from the mode's limits and snapped and clamped by Leaflet's own zoomSnap and bounds. The globe (fit-all) button self-aligns to the taller pill.
+
+## v112 — Mainland framing
+
+- Quiz reveal zooms now anchor on the country’s home landmass instead of fitting every overseas dependency into frame — answering a Netherlands question no longer zooms out across the Atlantic to include Bonaire. The camera uses the same largest-part-plus-neighbours framing the country browser and flag tiles already use (parts within 250 km of the mainland merge, so island chains like Japan’s Ryukyus still frame naturally); far-flung territories stay highlighted, they just don’t drag the view.
+- This also fixes the main world quiz, which had always framed the Netherlands, France and the United States at full span on reveals, and the “show me the area” pan clue, which for the Netherlands used to centre its general area over the open ocean.
+
+## v111 — Reveals that get out of the way
+
+- Portrait questions in the Royals and British Monarchy quizzes clear the portrait the moment they are answered — the info card carries it from there, and the map reveal gets the space back.
+- Flag reveals glide the flag smoothly to the far right edge of the screen as the country reveals itself: “Which country does this flag belong to?” animates from centre to edge (pure-CSS transform, honouring prefers-reduced-motion; a no-op on phones where the flag already sits at the right), while colour and pick-the-flag reveals appear already docked. The control panel auto-collapses when this happens, via the same shared restore flag the royals modes use — ending the quiz brings it back.
+- Fixed: British Monarchy “mystery reign” and portrait questions could hand the answer over — the synopsis or the portrait reveals the monarch’s gender, and only one of the four options was a woman. Name options are now gender-matched: the five queens regnant (Mary I, Elizabeth I, Anne, Victoria, Elizabeth II) draw their distractors from each other, and William III & Mary II reign jointly under William’s portrait in the kings’ pool. The world Royals quiz was already safe — its answers are countries, not names.
+
 ## v110 — The panel learns its place
 
 - The control panel is now viewport-aware: it caps its height to the screen and scrolls internally (thin scrollbar) instead of growing past the bottom edge on smaller resolutions. Mouse-wheel scrolling inside the panel does not zoom the map.

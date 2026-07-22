@@ -12,6 +12,7 @@
   .leaflet-control-attribution { display: none !important; }
   .leaflet-control-zoom a { background: rgba(255,255,255,0.94); border-bottom: 1px solid rgba(0,0,0,0.18); color: #111; font-weight: 700; }
   .leaflet-control-zoom a:hover { background: white; }
+  .leaflet-control-zoom a.quick-zoom { font-size: 13px; letter-spacing: -1.5px; font-weight: 800; }
   .leaflet-interactive { cursor: pointer; }
   .country-popup .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.28); cursor: pointer; }
   .country-popup .leaflet-popup-content { margin: 0; min-width: 210px; }
@@ -658,6 +659,9 @@
   .brit-spot-label::before { border-top-color: #b45309; }
   #quiz-photo-overlay { display: none; position: absolute; z-index: 945; left: 50%; top: 96px; transform: translateX(-50%); width: min(350px, calc(100vw - 24px)); pointer-events: none; background: rgba(255,255,255,.97); border: 3px solid #caa64a; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.30); padding: 6px; box-sizing: border-box; }
   #quiz-photo-overlay.active { display: block; }
+  #quiz-photo-overlay { transition: transform .55s cubic-bezier(.22,.9,.28,1); }
+  #quiz-photo-overlay.docked-right { transform: translateX(calc(50vw - 100% - 14px)); }
+  @media (prefers-reduced-motion: reduce) { #quiz-photo-overlay { transition: none; } }
   #quiz-photo-img { display: none; width: 100%; height: auto; max-height: 46vh; object-fit: cover; object-position: 50% 12%; border-radius: 9px; }
   #quiz-photo-img.show { display: block; }
   #quiz-photo-name { display: none; text-align: center; font-weight: 900; font-size: 17px; padding: 16px 8px; color: #172033; }
@@ -681,6 +685,7 @@
   #dispute-info.quiz-docked { left: auto; right: 14px; top: auto; bottom: 14px; width: min(324px, calc(100vw - 28px)); }
   @media (max-width: 680px) {
     #quiz-photo-overlay { left: auto; right: 10px; transform: none; top: 92px; width: min(230px, calc(100vw - 28px)); }
+    #quiz-photo-overlay.docked-right { transform: none; }
     #quiz-photo-img { max-height: 34vh; }
   }
   .disputes-quiz-row { display: grid; gap: 6px; margin: 0 0 8px; }
@@ -4662,8 +4667,17 @@ function britRelated(e, all) {
   }
   return { related, others };
 }
+const BRIT_QUEEN_IDS = new Set(['mary-i', 'elizabeth-i', 'anne', 'victoria', 'elizabeth-ii']);
+function britIsQueen(e) { return !!(e && BRIT_QUEEN_IDS.has(e.id)); }
 function britNameOptions(e, all) {
-  const rel = britRelated(e, all);
+  // Distractors match the subject's gender: reign synopses and portraits both
+  // reveal it, and a lone queen among three kings hands the answer over.
+  // (William III & Mary II reign jointly under William's portrait and sit in
+  // the kings' pool.)
+  const wantQueen = britIsQueen(e);
+  const sameGender = (all || []).filter(function(o) { return britIsQueen(o) === wantQueen; });
+  const source = sameGender.length >= 4 ? sameGender : (all || []);
+  const rel = britRelated(e, source);
   const seen = new Set([norm(e.name)]);
   const out = [e.name];
   for (const v of shuffleCopy(rel.related).concat(shuffleCopy(rel.others))) {
@@ -5253,6 +5267,7 @@ function hideQuizPhoto() {
   if (!ov) return;
   ov.classList.remove('active');
   ov.classList.remove('flag-photo');
+  ov.classList.remove('docked-right');
   const img = document.getElementById('quiz-photo-img');
   if (img) { img.onerror = null; img.onload = null; img.classList.remove('show'); img.classList.remove('photo-contain'); img.removeAttribute('src'); img.alt = ''; }
   const nm = document.getElementById('quiz-photo-name');
@@ -5715,7 +5730,25 @@ function revealQuizFlag(q) {
   // Find questions keep their flag docked in the quiz panel; popping the big
   // overlay here would cover the very country the map just revealed.
   if (q.type === 'find') return;
-  showQuizFlagPhoto(q.flagIso, q.flagRevealCaption || (q.candidate && q.candidate.name) || '', true);
+  const ov = document.getElementById('quiz-photo-overlay');
+  const caption = q.flagRevealCaption || (q.candidate && q.candidate.name) || '';
+  const showing = !!(ov && q.flagShowDuringQuestion && ov.classList.contains('active') && ov.classList.contains('flag-photo'));
+  if (showing) {
+    // The mystery flag is already on screen (flag-identify): keep it in place
+    // and just add the caption, so the dock below glides instead of snapping.
+    const nm = document.getElementById('quiz-photo-name');
+    if (nm) { nm.textContent = caption; nm.classList.add('show'); nm.classList.add('caption'); }
+  } else {
+    showQuizFlagPhoto(q.flagIso, caption, true);
+  }
+  if (ov) {
+    // Glide the flag to the right edge so the revealed country owns the map.
+    ov.classList.add('docked-right');
+    if (!isControlPanelCollapsed()) {
+      setControlPanelCollapsed(true);
+      royalsAutoCollapsedControls = true; // shared restore flag; stopQuiz() re-expands the controls
+    }
+  }
 }
 function hideInlineQuizFlag() {
   const host = document.getElementById('quiz-flag-inline');
@@ -6398,13 +6431,16 @@ function zoomToCandidate(candidate) {
     const rb = royalFocusBounds(candidate.royal, candidate);
     if (rb && rb.isValid && rb.isValid()) { map.flyToBounds(rb, { animate: true, duration: 0.75, padding: [70, 70], maxZoom: royalMaxZoom(candidate.royal) }); return; }
   }
-  const b = candidateBounds(candidate);
+  // Frame the mainland: far-flung dependencies stay highlighted, but the
+  // camera anchors on the home landmass (same rule the country browser and
+  // flag tiles already use).
+  const b = focusBoundsFromParts(candidate) || candidateBounds(candidate);
   if (!b) return;
   const maxZoom = mapMode === 'world' ? 7 : (mapMode === 'us-states' ? 7 : 9);
   map.flyToBounds(b, { animate: true, duration: 0.75, padding: [70, 70], maxZoom });
 }
 function zoomToCandidateGeneralArea(candidate) {
-  const b = candidateBounds(candidate);
+  const b = focusBoundsFromParts(candidate) || candidateBounds(candidate);
   if (!b) return;
   // A zoom clue should be very helpful without drawing/highlighting the exact answer.
   // Use a normal, safe fitBounds first, then nudge the view in screen pixels so the
@@ -6558,6 +6594,9 @@ function answerQuizChoice(value, btn) {
     if (correct && q.type === 'dispute-clue') { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
     showDisputeQuizInfo(q.candidate.dispute);
   }
+  // Portrait questions: the portrait leaves with the question - the info card
+  // shows it from here, and the map may have something worth revealing beneath.
+  if (q.photoRoyal) hideQuizPhoto();
   if (q.candidate && q.candidate.royal) {
     if (correct && (q.type === 'royal-clue' || q.type === 'royal-country' || q.type === 'royal-realm' || q.type === 'royal-photo-country' || q.type === 'royal-photo-not')) { highlightQuizCandidate(q.candidate); zoomToCandidate(q.candidate); }
     showRoyalQuizInfo(q.candidate.royal);
@@ -7963,12 +8002,41 @@ function scheduleDeferredMapDataLoad() {
 
 async function startQuizMap() {
   if (!window.L) { showFatal('Leaflet could not start. Please reload with an internet connection.'); return; }
+  const QUICK_ZOOM_FRACTION = 0.2; // each fast press covers 20% of the zoom range
+  function setupQuickZoom() {
+    if (!map || !map.zoomControl || !map.zoomControl.getContainer) return;
+    const container = map.zoomControl.getContainer();
+    if (!container || container.querySelector('.quick-zoom-in')) return;
+    const zoomIn = container.querySelector('.leaflet-control-zoom-in');
+    function quickStep() {
+      return Math.max(1, (map.getMaxZoom() - map.getMinZoom()) * QUICK_ZOOM_FRACTION);
+    }
+    function mkButton(cls, label, title, dir) {
+      const a = L.DomUtil.create('a', 'quick-zoom ' + cls);
+      a.href = '#';
+      a.innerHTML = label;
+      a.title = title;
+      a.setAttribute('role', 'button');
+      a.setAttribute('aria-label', title);
+      L.DomEvent.disableClickPropagation(a);
+      L.DomEvent.on(a, 'click', function(e) {
+        L.DomEvent.stop(e);
+        map.setZoom(map.getZoom() + dir * quickStep(), { animate: true });
+      });
+      return a;
+    }
+    const fastIn = mkButton('quick-zoom-in', '++', 'Fast zoom in (20% of the zoom range)', 1);
+    const fastOut = mkButton('quick-zoom-out', '\u2212\u2212', 'Fast zoom out (20% of the zoom range)', -1);
+    if (zoomIn) container.insertBefore(fastIn, zoomIn); else container.appendChild(fastIn);
+    container.appendChild(fastOut);
+  }
   map = L.map('map', {
     zoomControl: true, attributionControl: false, worldCopyJump: false,
     minZoom: 2, maxZoom: 10, zoomSnap: 0.25, zoomDelta: 0.25, preferCanvas: false,
     maxBounds: [[-88, -230], [88, 230]], maxBoundsViscosity: 0.7
   });
   window._countryQuizMap = map;
+  setupQuickZoom();
   const zoomOutCtl = L.control({ position: 'topleft' });
   zoomOutCtl.onAdd = function() {
     const div = L.DomUtil.create('div', 'leaflet-bar zoomout-ctl');
