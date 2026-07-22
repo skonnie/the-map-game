@@ -4677,14 +4677,19 @@ function britRelated(e, all) {
 }
 const BRIT_QUEEN_IDS = new Set(['mary-i', 'elizabeth-i', 'anne', 'victoria', 'elizabeth-ii']);
 function britIsQueen(e) { return !!(e && BRIT_QUEEN_IDS.has(e.id)); }
+function britJointReign(e) { return !!(e && e.id === 'william-mary'); }
 function britNameOptions(e, all) {
   // Distractors match the subject's gender: reign synopses and portraits both
   // reveal it, and a lone queen among three kings hands the answer over.
   // (William III & Mary II reign jointly under William's portrait and sit in
   // the kings' pool.)
   const wantQueen = britIsQueen(e);
-  const sameGender = (all || []).filter(function(o) { return britIsQueen(o) === wantQueen; });
-  const source = sameGender.length >= 4 ? sameGender : (all || []);
+  // The joint reign never plays in name questions: "William III & Mary II"
+  // answers itself among single sovereigns, and self-eliminates as a
+  // distractor beside a one-person portrait or a he/she synopsis.
+  const eligible = (all || []).filter(function(o) { return !britJointReign(o); });
+  const sameGender = eligible.filter(function(o) { return britIsQueen(o) === wantQueen; });
+  const source = sameGender.length >= 4 ? sameGender : eligible;
   const rel = britRelated(e, source);
   const seen = new Set([norm(e.name)]);
   const out = [e.name];
@@ -4708,6 +4713,7 @@ function buildBritQuestions(subjectPool, allEligible) {
     houseSeen.add(k); housePool.push(e.house);
   }
   const monarchOnly = allEligible.filter(function(e) { return !e.interregnum; });
+  const nameSubjectPool = monarchOnly.filter(function(e) { return !britJointReign(e); });
   const indices = [];
   for (let i = 0; i < targetCount; i++) indices.push(i);
   const clueSlots = new Set(targetCount >= 3 ? sample(indices, Math.min(BRIT_CLUES_PER_ROUND, targetCount)) : []);
@@ -4716,6 +4722,9 @@ function buildBritQuestions(subjectPool, allEligible) {
   const questions = [];
   for (let i = 0; i < targetCount; i++) {
     let e = pool[i % pool.length];
+    // The joint reign sits out name-answer questions; it still plays in the
+    // throne-order and royal-house questions below, and in the browser.
+    if (britJointReign(e) && (clueSlots.has(i) || photoSlots.has(i))) e = nameSubjectPool[i % nameSubjectPool.length];
     if (clueSlots.has(i)) {
       questions.push({
         type: 'brit-clue', candidate: britQuizCandidate(e),
@@ -4726,7 +4735,7 @@ function buildBritQuestions(subjectPool, allEligible) {
       });
       continue;
     }
-    if (e.interregnum) e = monarchOnly[i % monarchOnly.length];
+    if (e.interregnum) e = nameSubjectPool[i % nameSubjectPool.length];
     if (photoSlots.has(i)) {
       questions.push({
         type: 'brit-photo', candidate: britQuizCandidate(e), photoRoyal: { id: 'brit-' + e.id, wiki: e.wiki, monarch: e.name },

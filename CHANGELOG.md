@@ -1,5 +1,9 @@
 # Changelog
 
+## v115 — The joint reign retires from name questions
+
+- William III & Mary II no longer appears in any name-answer question — neither as the subject of mystery-reign or portrait questions (where the only two-name option answers itself) nor as a distractor in them (where it self-eliminates beside a one-person portrait or a he/she synopsis). The joint reign still features in the browser, the throne-order question (a dates question, where the format leaks nothing) and the royal-house question.
+
 ## v114 — Zoom cluster, compact
 
 - The fast-zoom buttons move beside the standard pair instead of above and below: a 2×2 grid — [+][++] over [−][−−] — restoring the control's original two-row height, so the quiz panel and info cards below clear it again without moving anything. The globe (fit-all) button now sits to the right of the cluster, vertically centred.
