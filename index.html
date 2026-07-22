@@ -12,7 +12,15 @@
   .leaflet-control-attribution { display: none !important; }
   .leaflet-control-zoom a { background: rgba(255,255,255,0.94); border-bottom: 1px solid rgba(0,0,0,0.18); color: #111; font-weight: 700; }
   .leaflet-control-zoom a:hover { background: white; }
-  .leaflet-control-zoom a.quick-zoom { font-size: 13px; letter-spacing: -1.5px; font-weight: 800; }
+  /* Fast-zoom cluster: a 2x2 grid - [+][++] over [−][−−] - keeping the
+     original two-row height so nothing below the controls needs to move. */
+  .leaflet-control-zoom { display: grid; grid-template-columns: repeat(2, auto); }
+  .leaflet-control-zoom a.quick-zoom { font-size: 13px; letter-spacing: -1.5px; font-weight: 800; border-left: 1px solid rgba(0,0,0,0.18); }
+  .leaflet-control-zoom a { border-radius: 0 !important; }
+  .leaflet-control-zoom a.leaflet-control-zoom-in { border-top-left-radius: 4px !important; }
+  .leaflet-control-zoom a.quick-zoom-in { border-top-right-radius: 4px !important; }
+  .leaflet-control-zoom a.leaflet-control-zoom-out { border-bottom-left-radius: 4px !important; border-bottom: none; }
+  .leaflet-control-zoom a.quick-zoom-out { border-bottom-right-radius: 4px !important; border-bottom: none; }
   .leaflet-interactive { cursor: pointer; }
   .country-popup .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.28); cursor: pointer; }
   .country-popup .leaflet-popup-content { margin: 0; min-width: 210px; }
@@ -8008,6 +8016,7 @@ async function startQuizMap() {
     const container = map.zoomControl.getContainer();
     if (!container || container.querySelector('.quick-zoom-in')) return;
     const zoomIn = container.querySelector('.leaflet-control-zoom-in');
+    const zoomOut = container.querySelector('.leaflet-control-zoom-out');
     function quickStep() {
       return Math.max(1, (map.getMaxZoom() - map.getMinZoom()) * QUICK_ZOOM_FRACTION);
     }
@@ -8027,7 +8036,7 @@ async function startQuizMap() {
     }
     const fastIn = mkButton('quick-zoom-in', '++', 'Fast zoom in (20% of the zoom range)', 1);
     const fastOut = mkButton('quick-zoom-out', '\u2212\u2212', 'Fast zoom out (20% of the zoom range)', -1);
-    if (zoomIn) container.insertBefore(fastIn, zoomIn); else container.appendChild(fastIn);
+    if (zoomOut) container.insertBefore(fastIn, zoomOut); else container.appendChild(fastIn);
     container.appendChild(fastOut);
   }
   map = L.map('map', {
@@ -8055,7 +8064,7 @@ async function startQuizMap() {
       div.style.position = 'absolute';
       div.style.margin = '0';
       div.style.left = (zb.offsetLeft + zb.offsetWidth + 8) + 'px';
-      div.style.top = (zb.offsetTop + zb.offsetHeight - div.offsetHeight) + 'px';
+      div.style.top = (zb.offsetTop + Math.max(0, Math.round((zb.offsetHeight - div.offsetHeight) / 2))) + 'px';
     });
     return div;
   };

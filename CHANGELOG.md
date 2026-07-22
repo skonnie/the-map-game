@@ -1,5 +1,9 @@
 # Changelog
 
+## v114 — Zoom cluster, compact
+
+- The fast-zoom buttons move beside the standard pair instead of above and below: a 2×2 grid — [+][++] over [−][−−] — restoring the control's original two-row height, so the quiz panel and info cards below clear it again without moving anything. The globe (fit-all) button now sits to the right of the cluster, vertically centred.
+
 ## v113 — Fast zoom
 
 - Two fast-zoom buttons join the standard Leaflet pill, top to bottom: ++ / + / − / −−. Each fast press jumps 20% of the current mode's zoom range — five presses cover minimum to maximum — computed live from the mode's limits and snapped and clamped by Leaflet's own zoomSnap and bounds. The globe (fit-all) button self-aligns to the taller pill.
