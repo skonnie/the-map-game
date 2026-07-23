@@ -1,5 +1,10 @@
 # Changelog
 
+## v117 — Rollback
+
+- Reverts all v116 overlap-management changes (the layout arbiter, overlay image caps, info-card width/height reshaping and internal scrolling, expanded observers and release hooks) to v115 behaviour exactly — verified by byte-level reconstruction. The earlier coordination that predates v116 (the control panel yielding to the learn-about widget, and the panel auto-collapse on flag docking) remains as it was in v115.
+- Retained from v116: the fast-zoom glyph legibility fix only — ++ and −− render as clearly separated pairs (+ + / − −) instead of kerning into a single dash.
+
 ## v116 — Nothing obscures anything
 
 - Fixed: the fast-zoom −− read as a single long dash — both minus signs were present but letter-spacing kerned them into one. The ++ and −− pairs now carry a thin space and no squeeze, so the double glyphs read clearly.
