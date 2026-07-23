@@ -1,5 +1,11 @@
 # Changelog
 
+## v116 — Nothing obscures anything
+
+- Fixed: the fast-zoom −− read as a single long dash — both minus signs were present but letter-spacing kerned them into one. The ++ and −− pairs now carry a thin space and no squeeze, so the double glyphs read clearly.
+- New: a layout arbiter enforces the rule that no floating surface may obscure another — control panel, photo/flag overlay, info card, quiz panel and learn-about widget are all watched (ResizeObserver + resize), and any overlap is resolved by reshaping first (capping the portrait/flag image height to the free space, capping the info card’s width against the panel and height against the widget, with internal scrolling), collapsing a surface only when no reshape can fit (below 140 px for images, 200 px card width, 170 px card height). Caps are sticky for the life of an overlay or card and released when it closes, so the layout settles instead of oscillating.
+- The info card also gains a base viewport height cap with tidy internal scrolling — long royal synopses no longer run off the bottom of the screen.
+
 ## v115 — The joint reign retires from name questions
 
 - William III & Mary II no longer appears in any name-answer question — neither as the subject of mystery-reign or portrait questions (where the only two-name option answers itself) nor as a distractor in them (where it self-eliminates beside a one-person portrait or a he/she synopsis). The joint reign still features in the browser, the throne-order question (a dates question, where the format leaks nothing) and the royal-house question.
